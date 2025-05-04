@@ -1,16 +1,13 @@
+// Bootstrap primero si no vas a sobreescribir variables de Bootstrap
+@use '~bootstrap/scss/bootstrap';
+
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
-// Variables
-@import 'variables';
-
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
-
-// Paleta de colores principal
-$primary: #1976d2; // Azul vibrante (nuevo color principal)
-$secondary: #003366; // Azul oscuro
-$accent: #007bff; // Azul claro
+// Paleta de colores principal (variables locales)
+$primary: #1976d2;
+$secondary: #003366;
+$accent: #007bff;
 $gray-light: #f8f9fa;
 $gray-dark: #343a40;
 
@@ -71,4 +68,9 @@ body {
   .search-box {
     width: 98vw !important;
   }
+}
+
+.gallery-thumb.active {
+  border: 2px solid $primary !important;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }

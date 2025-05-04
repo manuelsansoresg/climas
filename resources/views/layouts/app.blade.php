@@ -19,6 +19,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <!-- App JS -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png">
 </head>
 <body>
     <div id="app">
