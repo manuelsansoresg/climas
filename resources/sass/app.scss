@@ -1,0 +1,74 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// Paleta de colores principal
+$primary: #1976d2; // Azul vibrante (nuevo color principal)
+$secondary: #003366; // Azul oscuro
+$accent: #007bff; // Azul claro
+$gray-light: #f8f9fa;
+$gray-dark: #343a40;
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: $gray-light;
+}
+
+.navbar {
+  background: #fff !important;
+  .navbar-brand span {
+    color: #003366 !important;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+  .btn, .nav-link {
+    color: #003366 !important;
+  }
+  .btn.text-primary {
+    color: #1976d2 !important;
+  }
+  .btn.text-accent {
+    color: #007bff !important;
+  }
+}
+
+#searchOverlay {
+  transition: opacity 0.3s;
+  .search-box {
+    border: 2px solid $primary;
+    input {
+      font-size: 1.2rem;
+    }
+    button {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+#cartCount {
+  font-size: 0.8rem;
+  min-width: 1.5em;
+  min-height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1976d2 !important;
+}
+
+.badge.bg-danger {
+  background: #1976d2 !important;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-brand span {
+    font-size: 1.2rem;
+  }
+  .search-box {
+    width: 98vw !important;
+  }
+}
