@@ -30,7 +30,6 @@
                     <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="me-2">
                 </a>
                 <div class="d-flex align-items-center ms-auto">
-                    <button class="btn text-primary me-2" id="searchToggle"><i class="fas fa-search fa-lg"></i></button>
                     <a href="#" class="btn text-primary me-2"><i class="fas fa-user fa-lg"></i></a>
                     <a href="#" class="btn text-primary position-relative">
                         <i class="fas fa-shopping-bag fa-lg"></i>
@@ -55,5 +54,53 @@
     </div>
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="mb-3">
+                    <p class="text-secondary">Soluciones integrales en climatización y ventilación para hogares y empresas.</p>
+                </div>
+                <div class="col-lg-2 mb-4 mb-lg-0">
+                    <h5 class="text-secondary mb-3">Enlaces</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" class="text-decoration-none text-secondary">Inicio</a></li>
+                        <li class="mb-2"><a href="/contacto" class="text-decoration-none text-secondary">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 mb-4 mb-lg-0">
+                    <h5 class="text-secondary mb-3">Contacto</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i> (123) 456-7890</li>
+                        <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> info@backticlimas.com</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt text-primary me-2"></i> Dirección Ejemplo #123</li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h5 class="text-secondary mb-3">Síguenos</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-primary"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="#" class="text-primary"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="text-primary"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#" class="text-primary"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="py-3" style="background-color: #003366;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="mb-0 text-white">&copy; {{ date('Y') }} BackTI Climas. Todos los derechos reservados.</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                        <a href="/privacidad" class="text-white text-decoration-none me-3">Política de Privacidad</a>
+                        <a href="/terminos" class="text-white text-decoration-none">Términos y Condiciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
