@@ -15,13 +15,21 @@
                 <div class="nk-block">
                     <div class="card">
                         <div class="card-body">
+                            @if(session('error'))
+                                <div class="alert alert-danger">{{ session('error') }}</div>
+                            @endif
+
                             @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul class="mb-0">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>¡Por favor corrige los siguientes errores!</strong>
+                                    <ul class="mb-0 mt-2">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach
                                     </ul>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
                             @endif
 
@@ -34,7 +42,7 @@
                                             <label for="name">Nombre del Producto <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                                             @error('name')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -50,7 +58,7 @@
                                                 @endforeach
                                             </select>
                                             @error('category_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
@@ -150,8 +158,8 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="image">Imagen Principal <span class="text-danger">*</span></label>
-                                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" required>
                                             <small class="form-text text-muted">Formatos permitidos: jpeg, png, jpg, gif. Máximo 2MB</small>
+                                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" required>
                                             @error('image')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -184,15 +192,19 @@
                                                                 {{ in_array($sucursal->id, old('sucursales', [])) ? 'checked' : '' }}>
                                                             <label class="custom-control-label" for="sucursal_{{ $sucursal->id }}">{{ $sucursal->name }}</label>
                                                         </div>
-                                                        <input type="number" 
-                                                            class="form-control mt-2 @error('stock_sucursal.'.$sucursal->id) is-invalid @enderror" 
-                                                            name="stock_sucursal[{{ $sucursal->id }}]" 
-                                                            placeholder="Stock" 
-                                                            min="0"
-                                                            value="{{ old('stock_sucursal.'.$sucursal->id, 0) }}">
-                                                        @error('stock_sucursal.'.$sucursal->id)
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
+                                                        <div class="form-group mt-2">
+                                                            <label for="stock_{{ $sucursal->id }}">Stock</label>
+                                                            <input type="number" 
+                                                                class="form-control @error('stock_sucursal.'.$sucursal->id) is-invalid @enderror" 
+                                                                id="stock_{{ $sucursal->id }}"
+                                                                name="stock_sucursal[{{ $sucursal->id }}]" 
+                                                                placeholder="Ingrese el stock" 
+                                                                min="0"
+                                                                value="{{ old('stock_sucursal.'.$sucursal->id, 0) }}">
+                                                            @error('stock_sucursal.'.$sucursal->id)
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
                                                     </div>
                                                 @endforeach
                                             </div>

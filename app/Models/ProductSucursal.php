@@ -9,6 +9,8 @@ class ProductSucursal extends Model
 {
     use HasFactory;
 
+    protected $table = 'product_sucursal';
+
     protected $fillable = [
         'product_id',
         'sucursal_id',
