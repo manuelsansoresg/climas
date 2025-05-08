@@ -54,10 +54,16 @@ class CreateProduct extends Migration
         Schema::create('sucursales', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->smallInteger('status')->nullable();
+            $table->string('address')->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->string('email')->nullable();
+            $table->boolean('status')->default(true);
+            $table->text('description')->nullable();
+            $table->text('opening_hours')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
-        }); 
+        });
         
 
         Schema::create('products', function (Blueprint $table) {

@@ -18,7 +18,12 @@ class Subcategory extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class)->nullOnDelete();
+    }
+
+    public function subcategories2()
+    {
+        return $this->hasMany(Subcategory2::class);
     }
 }
 

@@ -12,6 +12,7 @@
     <title>@yield('title')</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css?ver=3.2.4') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css?ver=3.2.4') }}">
 </head>
 
@@ -70,17 +71,17 @@
                                     </a>
                                     <ul class="nk-menu-sub">
                                         <li class="nk-menu-item">
-                                            <a href="#" class="nk-menu-link"><span class="nk-menu-text">Categorias</span></a>
+                                            <a href="/admin/categories" class="nk-menu-link"><span class="nk-menu-text">Categorias</span></a>
                                         </li>
                                         <li class="nk-menu-item">
-                                            <a href="#" class="nk-menu-link"><span class="nk-menu-text">Subcategorias</span></a>
+                                            <a href="/admin/subcategories" class="nk-menu-link"><span class="nk-menu-text">Subcategorias</span></a>
                                         </li>
                                        
                                         <li class="nk-menu-item">
-                                            <a href="#" class="nk-menu-link"><span class="nk-menu-text">Subcategoria 2</span></a>
+                                            <a href="/admin/subcategories2" class="nk-menu-link"><span class="nk-menu-text">Subcategoria 2</span></a>
                                         </li>
                                         <li class="nk-menu-item">
-                                            <a href="#" class="nk-menu-link"><span class="nk-menu-text">Subcategoria 3</span></a>
+                                            <a href="/admin/subcategories3" class="nk-menu-link"><span class="nk-menu-text">Subcategoria 3</span></a>
                                         </li>
                                     </ul><!-- .nk-menu-sub -->
                                 </li><!-- .nk-menu-item -->
@@ -92,7 +93,14 @@
                                 </li><!-- .nk-menu-item -->
                               
                                 <li class="nk-menu-item">
-                                    <a href="#" class="nk-menu-link">
+                                    <a href="/admin/sucursales" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-building"></em></span>
+                                        <span class="nk-menu-text">Sucursales</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
+
+                                <li class="nk-menu-item">
+                                    <a href="/admin/products" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-card-view"></em></span>
                                         <span class="nk-menu-text">Productos</span>
                                     </a>
@@ -118,8 +126,8 @@
                             </div>
                             <div class="nk-header-brand d-xl-none">
                                 <a href="html/index.html" class="logo-link">
-                                    <img class="logo-light logo-img" src="./images/logo.png" srcset="./images/logo2x.png 2x" alt="logo">
-                                    <img class="logo-dark logo-img" src="./images/logo-dark.png" srcset="./images/logo-dark2x.png 2x" alt="logo-dark">
+                                    <img class="logo-light logo-img" src="/images/logo.png" srcset="/images/logo2x.png 2x" alt="logo">
+                                    <img class="logo-dark logo-img" src="/images/logo-dark.png" srcset="/images/logo-dark2x.png 2x" alt="logo-dark">
                                 </a>
                             </div><!-- .nk-header-brand -->
                             
@@ -148,12 +156,13 @@
                                         <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
                                             <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                                                 <div class="user-card">
-                                                    <div class="user-avatar">
-                                                        <span>AB</span>
-                                                    </div>
+                                                    
                                                     <div class="user-info">
-                                                        <span class="lead-text">Abu Bin Ishtiyak</span>
-                                                        <span class="sub-text">info@softnio.com</span>
+                                                        @if (Route::has('login'))
+                                                            <span class="lead-text"> {{ Auth::user()->name }}</span>
+                                                            <span class="sub-text"> {{ Auth::user()->email }}</span>
+                                                        
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -195,7 +204,7 @@
                                 <div class="nk-block-head nk-block-head-sm">
                                     <div class="nk-block-between">
                                         <div class="nk-block-head-content">
-                                            <h3 class="nk-block-title page-title">Bienvenido</h3>
+                                            <h3 class="nk-block-title page-title"></h3>
                                         </div><!-- .nk-block-head-content -->
                                         <div class="nk-block-head-content" style="display: none;">
                                             <div class="toggle-wrap nk-block-tools-toggle">
@@ -506,7 +515,7 @@
                                                         <div class="nk-tb-col tb-col-sm">
                                                             <div class="user-card">
                                                                 <div class="user-avatar sm bg-warning-dim">
-                                                                    <img src="./images/avatar/b-sm.jpg" alt="">
+                                                                    <img src="/images/avatar/b-sm.jpg" alt="">
                                                                 </div>
                                                                 <div class="user-name">
                                                                     <span class="tb-lead">Blanca Schultz</span>
@@ -597,7 +606,7 @@
                                                     <ul class="nk-top-products">
                                                         <li class="item">
                                                             <div class="thumb">
-                                                                <img src="./images/product/a.png" alt="">
+                                                                <img src="/images/product/a.png" alt="">
                                                             </div>
                                                             <div class="info">
                                                                 <div class="title">Pink Fitness Tracker</div>
@@ -610,7 +619,7 @@
                                                         </li>
                                                         <li class="item">
                                                             <div class="thumb">
-                                                                <img src="./images/product/b.png" alt="">
+                                                                <img src="/images/product/b.png" alt="">
                                                             </div>
                                                             <div class="info">
                                                                 <div class="title">Purple Smartwatch</div>
@@ -623,7 +632,7 @@
                                                         </li>
                                                         <li class="item">
                                                             <div class="thumb">
-                                                                <img src="./images/product/c.png" alt="">
+                                                                <img src="/images/product/c.png" alt="">
                                                             </div>
                                                             <div class="info">
                                                                 <div class="title">Black Smartwatch</div>
@@ -636,7 +645,7 @@
                                                         </li>
                                                         <li class="item">
                                                             <div class="thumb">
-                                                                <img src="./images/product/d.png" alt="">
+                                                                <img src="/images/product/d.png" alt="">
                                                             </div>
                                                             <div class="info">
                                                                 <div class="title">Black Headphones</div>
@@ -649,7 +658,7 @@
                                                         </li>
                                                         <li class="item">
                                                             <div class="thumb">
-                                                                <img src="./images/product/e.png" alt="">
+                                                                <img src="/images/product/e.png" alt="">
                                                             </div>
                                                             <div class="info">
                                                                 <div class="title">iPhone 7 Headphones</div>
@@ -732,109 +741,109 @@
                         <ul class="country-list text-center gy-2">
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/arg.png" alt="" class="country-flag">
+                                    <img src="/images/flags/arg.png" alt="" class="country-flag">
                                     <span class="country-name">Argentina</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/aus.png" alt="" class="country-flag">
+                                    <img src="/images/flags/aus.png" alt="" class="country-flag">
                                     <span class="country-name">Australia</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/bangladesh.png" alt="" class="country-flag">
+                                    <img src="/images/flags/bangladesh.png" alt="" class="country-flag">
                                     <span class="country-name">Bangladesh</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/canada.png" alt="" class="country-flag">
+                                    <img src="/images/flags/canada.png" alt="" class="country-flag">
                                     <span class="country-name">Canada <small>(English)</small></span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/china.png" alt="" class="country-flag">
+                                    <img src="/images/flags/china.png" alt="" class="country-flag">
                                     <span class="country-name">Centrafricaine</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/china.png" alt="" class="country-flag">
+                                    <img src="/images/flags/china.png" alt="" class="country-flag">
                                     <span class="country-name">China</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/french.png" alt="" class="country-flag">
+                                    <img src="/images/flags/french.png" alt="" class="country-flag">
                                     <span class="country-name">France</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/germany.png" alt="" class="country-flag">
+                                    <img src="/images/flags/germany.png" alt="" class="country-flag">
                                     <span class="country-name">Germany</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/iran.png" alt="" class="country-flag">
+                                    <img src="/images/flags/iran.png" alt="" class="country-flag">
                                     <span class="country-name">Iran</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/italy.png" alt="" class="country-flag">
+                                    <img src="/images/flags/italy.png" alt="" class="country-flag">
                                     <span class="country-name">Italy</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/mexico.png" alt="" class="country-flag">
+                                    <img src="/images/flags/mexico.png" alt="" class="country-flag">
                                     <span class="country-name">México</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/philipine.png" alt="" class="country-flag">
+                                    <img src="/images/flags/philipine.png" alt="" class="country-flag">
                                     <span class="country-name">Philippines</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/portugal.png" alt="" class="country-flag">
+                                    <img src="/images/flags/portugal.png" alt="" class="country-flag">
                                     <span class="country-name">Portugal</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/s-africa.png" alt="" class="country-flag">
+                                    <img src="/images/flags/s-africa.png" alt="" class="country-flag">
                                     <span class="country-name">South Africa</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/spanish.png" alt="" class="country-flag">
+                                    <img src="/images/flags/spanish.png" alt="" class="country-flag">
                                     <span class="country-name">Spain</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/switzerland.png" alt="" class="country-flag">
+                                    <img src="/images/flags/switzerland.png" alt="" class="country-flag">
                                     <span class="country-name">Switzerland</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/uk.png" alt="" class="country-flag">
+                                    <img src="/images/flags/uk.png" alt="" class="country-flag">
                                     <span class="country-name">United Kingdom</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" class="country-item">
-                                    <img src="./images/flags/english.png" alt="" class="country-flag">
+                                    <img src="/images/flags/english.png" alt="" class="country-flag">
                                     <span class="country-name">United State</span>
                                 </a>
                             </li>
@@ -845,9 +854,10 @@
         </div><!-- .modla-dialog -->
     </div><!-- .modal -->
     <!-- JavaScript -->
-    <script src="./assets/js/bundle.js?ver=3.2.4"></script>
-    <script src="./assets/js/scripts.js?ver=3.2.4"></script>
-    <script src="./assets/js/charts/chart-ecommerce.js?ver=3.2.4"></script>
+    <script src="/assets/js/bundle.js?ver=3.2.4"></script>
+    <script src="/assets/js/scripts.js?ver=3.2.4"></script>
+    <script src="/assets/js/charts/chart-ecommerce.js?ver=3.2.4"></script>
+    <script src="{{ asset('js/app.js?v=1.0.0') }}"></script>
 </body>
 
 </html>
