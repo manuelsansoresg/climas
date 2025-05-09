@@ -61,4 +61,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Rutas para sucursales
     Route::resource('sucursales', \App\Http\Controllers\Admin\SucursalController::class);
+
+    // Client routes
+    Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);
 });
