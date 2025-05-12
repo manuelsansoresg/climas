@@ -156,6 +156,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        $product->load('images');
         $categories = Category::all();
         $sucursales = Sucursal::all();
         $selectedSucursales = $product->productSucursales->pluck('sucursal_id')->toArray();
@@ -330,5 +331,19 @@ class ProductController extends Controller
         $image->delete();
         
         return response()->json(['success' => true]);
+    }
+
+    public function deleteMainImage(Product $product)
+    {
+        if ($product->image) {
+            // Borra el archivo físico si existe
+            if (file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
+            }
+            $product->image = null;
+            $product->save();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 404);
     }
 } 

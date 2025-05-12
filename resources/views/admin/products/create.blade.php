@@ -157,7 +157,11 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="image">Imagen Principal <span class="text-danger">*</span></label>
+                                            <label for="image" class="form-label">Imagen Principal <span class="text-danger">*</span></label>
+                                            <div class="d-inline-block position-relative me-2 mb-2" id="main-image-block">
+                                                <img id="previewImage" src="" alt="Vista previa" style="max-width: 200px; display: none;">
+                                                <button id="mainImageDeleteBtn" type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 btn-remove-preview" style="display:none;right:0;top:0;z-index:2;">×</button>
+                                            </div>
                                             <small class="form-text text-muted">Formatos permitidos: jpeg, png, jpg, gif. Máximo 2MB</small>
                                             <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" required>
                                             @error('image')
@@ -168,6 +172,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="images">Imágenes Adicionales</label>
+                                            <div id="additionalImagesPreview" class="mb-2"></div>
                                             <input type="file" class="form-control @error('images.*') is-invalid @enderror" id="images" name="images[]" multiple>
                                             <small class="form-text text-muted">Formatos permitidos: jpeg, png, jpg, gif. Máximo 2MB por imagen</small>
                                             @error('images.*')
@@ -252,4 +257,61 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function previewMainImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImage').src = e.target.result;
+            document.getElementById('mainImagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function deleteMainImage() {
+    document.getElementById('image').value = '';
+    document.getElementById('mainImagePreview').style.display = 'none';
+    document.getElementById('previewImage').src = '';
+}
+
+function previewAdditionalImages(input) {
+    const preview = document.getElementById('additionalImagesPreview');
+    preview.innerHTML = '';
+    
+    if (input.files) {
+        Array.from(input.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'd-inline-block position-relative me-2 mb-2';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Vista previa" style="max-width: 100px;">
+                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeAdditionalImage(${index})">×</button>
+                `;
+                preview.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function removeAdditionalImage(index) {
+    const dt = new DataTransfer();
+    const input = document.getElementById('images');
+    const { files } = input;
+    
+    for (let i = 0; i < files.length; i++) {
+        if (i !== index) {
+            dt.items.add(files[i]);
+        }
+    }
+    
+    input.files = dt.files;
+    previewAdditionalImages(input);
+}
+</script>
 @endsection 

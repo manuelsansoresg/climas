@@ -45,6 +45,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('products.update');
     Route::delete('products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('products.destroy');
     Route::delete('products/images/{id}', [App\Http\Controllers\Admin\ProductController::class, 'deleteImage'])->name('products.images.delete');
+    Route::delete('products/{product}/delete-main-image', [App\Http\Controllers\Admin\ProductController::class, 'deleteMainImage'])->name('products.deleteMainImage');
 
     // Rutas para obtener subcategorías
     Route::get('categories/{category}/subcategories', function ($category) {

@@ -155,13 +155,17 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="image">Imagen Principal</label>
-                                            @if($product->image)
-                                                <div class="mb-2">
-                                                    <img src="{{ asset($product->image) }}" alt="Imagen actual" style="max-width: 200px;">
-                                                </div>
-                                            @endif
-                                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">
+                                            <label for="image" class=" d-block">Imagen Principal</label>
+                                            <div class="d-inline-block position-relative me-2 mb-2" id="main-image-block">
+                                                @if($product->image)
+                                                    <img id="previewImage" src="{{ asset($product->image) }}" alt="Imagen actual" style="max-width: 200px; display: block;">
+                                                    <button id="mainImageDeleteBtn" type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" style="right:0;top:0;z-index:2;" onclick="deleteMainProductImage({{ $product->id }})">×</button>
+                                                @else
+                                                    <img id="previewImage" src="" alt="Vista previa" style="max-width: 200px; display: none;">
+                                                    <button id="mainImageDeleteBtn" type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" style="display:none;right:0;top:0;z-index:2;" onclick="deleteMainProductImage({{ $product->id }})">×</button>
+                                                @endif
+                                            </div>
+                                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" onchange="previewMainImage(this)">
                                             @error('image')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -170,17 +174,18 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="images">Imágenes Adicionales</label>
-                                            @if($product->images->count() > 0)
-                                                <div class="mb-2">
+                                            <div id="additionalImagesPreview" class="mb-2">
+                                                @if($product->images->count() > 0)
                                                     @foreach($product->images as $image)
-                                                        <div class="d-inline-block position-relative me-2 mb-2">
+                                                        {{-- dump($image->id) --}}
+                                                        <div class="d-inline-block position-relative me-2 mb-2" id="product-image-{{ $image->id }}">
                                                             <img src="{{ asset($image->image) }}" alt="Imagen adicional" style="max-width: 100px;">
-                                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="deleteImage({{ $image->id }})">×</button>
+                                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 btn-delete-adicional" data-id="{{ $image->id }}">×</button>
                                                         </div>
                                                     @endforeach
-                                                </div>
-                                            @endif
-                                            <input type="file" class="form-control @error('images.*') is-invalid @enderror" id="images" name="images[]" multiple>
+                                                @endif
+                                            </div>
+                                            <input type="file" class="form-control @error('images.*') is-invalid @enderror" id="images" name="images[]" multiple onchange="previewAdditionalImages(this)">
                                             @error('images.*')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
@@ -248,4 +253,10 @@
         </div>
     </div>
 </div>
-@endsection 
+
+@section('scripts')
+{{-- El JS para este formulario está en resources/js/app.js --}}
+@endsection
+    
+@endsection
+

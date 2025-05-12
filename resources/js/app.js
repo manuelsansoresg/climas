@@ -187,9 +187,99 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Función para eliminar imágenes adicionales
-    window.deleteImage = function(imageId) {
-        if (confirm('¿Está seguro de eliminar esta imagen?')) {
+    // --- PRODUCTOS: EDICIÓN DE IMÁGENES ---
+    window.previewMainImage = function(input) {
+        const previewImg = document.getElementById('previewImage');
+        const deleteBtn = document.getElementById('mainImageDeleteBtn');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                if (deleteBtn) deleteBtn.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+            if (deleteBtn) deleteBtn.style.display = 'none';
+        }
+    }
+
+    document.getElementById('image')?.addEventListener('change', function() {
+        window.previewMainImage(this);
+    });
+
+    document.getElementById('mainImageDeleteBtn')?.addEventListener('click', function() {
+        const previewImg = document.getElementById('previewImage');
+        const input = document.getElementById('image');
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+        this.style.display = 'none';
+        if (input) input.value = '';
+    });
+
+    window.previewAdditionalImages = function(input) {
+        const preview = document.getElementById('additionalImagesPreview');
+        // Elimina previews previos generados por JS
+        Array.from(preview.querySelectorAll('.js-preview')).forEach(el => el.remove());
+        if (input.files) {
+            Array.from(input.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'd-inline-block position-relative me-2 mb-2 js-preview';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Vista previa" style="max-width: 100px;">
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 btn-remove-preview">×</button>
+                    `;
+                    preview.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    window.removeAdditionalImage = function(index) {
+        const dt = new DataTransfer();
+        const input = document.getElementById('images');
+        const { files } = input;
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dt.items.add(files[i]);
+            }
+        }
+        input.files = dt.files;
+        window.previewAdditionalImages(input);
+    }
+
+    window.deleteMainProductImage = function(productId) {
+        if (confirm('¿Seguro que deseas eliminar la imagen principal?')) {
+            fetch(`/admin/products/${productId}/delete-main-image`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('previewImage').style.display = 'none';
+                    document.getElementById('mainImageDeleteBtn').style.display = 'none';
+                } else {
+                    alert('No se pudo eliminar la imagen');
+                }
+            });
+        }
+    }
+
+    window.deleteProductImage = function(imageId) {
+        console.log('Intentando borrar imagen adicional con id:', imageId);
+        if (!imageId || isNaN(Number(imageId))) {
+            alert('ID de imagen adicional inválido.');
+            return;
+        }
+        if (confirm('¿Seguro que deseas eliminar esta imagen adicional?')) {
             fetch(`/admin/products/images/${imageId}`, {
                 method: 'DELETE',
                 headers: {
@@ -199,11 +289,46 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    var imgDiv = document.getElementById('product-image-' + imageId);
+                    if (imgDiv) imgDiv.remove();
                 } else {
-                    alert('Error al eliminar la imagen');
+                    alert('No se pudo eliminar la imagen adicional');
                 }
             });
         }
     }
+
+    document.addEventListener('click', function(e) {
+        // Borrar imagen adicional de la base de datos
+        if (e.target && e.target.classList.contains('btn-delete-adicional')) {
+            const imageId = e.target.getAttribute('data-id');
+            console.log('Click en botón eliminar adicional, id:', imageId);
+            if (imageId && !isNaN(Number(imageId))) {
+                if (confirm('¿Seguro que deseas eliminar esta imagen adicional?')) {
+                    fetch(`/admin/products/images/${imageId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            var imgDiv = document.getElementById('product-image-' + imageId);
+                            if (imgDiv) imgDiv.remove();
+                        } else {
+                            alert('No se pudo eliminar la imagen adicional');
+                        }
+                    });
+                }
+            } else {
+                alert('ID de imagen adicional inválido.');
+            }
+        }
+        // Borrar preview local de imagen nueva
+        if (e.target && e.target.classList.contains('btn-remove-preview')) {
+            const previewDiv = e.target.closest('.js-preview');
+            if (previewDiv) previewDiv.remove();
+        }
+    });
 });
