@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $data_user = array('name' => 'manuel',
+        $data_user = array('name' => 'Alejandro',
         'email' => 'manuelsansoresg@gmail.com', 'password' => bcrypt('demor00txx'));
         $user = new User($data_user);
         $user->save();
