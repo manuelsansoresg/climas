@@ -21,12 +21,14 @@
                             <p><strong>Email:</strong> {{ $sale->client->email }}</p>
                             <p><strong>Teléfono:</strong> {{ $sale->client->phone }}</p>
                             <p><strong>RFC:</strong> {{ $sale->client->rfc }}</p>
+                            
                         </div>
                         <div class="col-md-6">
                             <h6>Información de la Venta</h6>
                             <p><strong>Fecha:</strong> {{ $sale->created_at->format('d/m/Y H:i') }}</p>
                             <p><strong>Vendedor:</strong> {{ $sale->user->name }}</p>
                             <p><strong>Método de Pago:</strong> {{ ucfirst($sale->payment_method) }}</p>
+                            <p><strong>Notas:</strong> {{ $sale->notes }}</p>
                             <p><strong>Estado:</strong> 
                                 <span class="badge bg-{{ $sale->status === 'completed' ? 'success' : ($sale->status === 'pending' ? 'warning' : 'danger') }}">
                                     {{ ucfirst($sale->status) }}
