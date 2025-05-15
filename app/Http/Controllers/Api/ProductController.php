@@ -25,27 +25,14 @@ class ProductController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'precio_publico' => $this->getPriceByUserRole($product),
+                    'precio_publico' => $product->precio_publico,
+                    'precio_mayorista' => $product->precio_mayorista,
+                    'precio_distribuidor' => $product->precio_distribuidor,
                     'iva' => $product->iva,
                     'stock' => $stock
                 ];
             });
 
         return response()->json($products);
-    }
-
-    private function getPriceByUserRole($product)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return $product->precio_publico;
-        }
-        if ($user->hasRole('Cliente mayorista')) {
-            return $product->precio_mayorista;
-        }
-        if ($user->hasRole('Cliente instalador')) {
-            return $product->precio_publico * 0.9; // 10% discount for installers
-        }
-        return $product->precio_publico;
     }
 } 

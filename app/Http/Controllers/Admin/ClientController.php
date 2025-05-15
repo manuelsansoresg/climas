@@ -153,6 +153,11 @@ class ClientController extends Controller
             })
             ->take(10)
             ->get(['id', 'name', 'last_name', 'email', 'rfc']);
+        // Adjuntar el rol principal a cada cliente
+        $clients = $clients->map(function($client) {
+            $client->role = $client->roles->first()->name ?? 'Cliente publico en general';
+            return $client;
+        });
         return response()->json($clients);
     }
 }

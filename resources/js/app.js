@@ -332,9 +332,64 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Variables globales para el rol del cliente y productos
+    let clienteSeleccionado = { role: 'Cliente publico en general' };
+    let lastProductResults = {};
+    let productsAdded = [];
+
+    // Función para obtener el precio según el rol del cliente
+    function obtenerPrecioPorRol(producto, role) {
+        if (role === 'Cliente mayorista') {
+            return producto.precio_mayorista;
+        } else if (role === 'Cliente instalador') {
+            return producto.precio_distribuidor;
+        } else {
+            return producto.precio_publico;
+        }
+    }
+
+    // --- CLIENTE: BUSQUEDA AJAX CON SELECT2 EN VENTAS ---
+    if (document.getElementById('client-search')) {
+        $('#client-search').select2({
+            placeholder: 'Buscar cliente por nombre, email o RFC',
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (client) {
+                            return {
+                                id: client.id,
+                                text: (client.name || '') + ' ' + (client.last_name || ''),
+                                role: client.role || 'Cliente publico en general'
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            width: '100%',
+            templateResult: function (data) {
+                return data.text;
+            },
+            escapeMarkup: function (markup) { return markup; }
+        });
+
+        // Guardar el cliente seleccionado y actualizar precios
+        $('#client-search').on('select2:select', function (e) {
+            const data = e.params.data;
+            clienteSeleccionado = data;
+            actualizarPreciosPorRol();
+        });
+    }
+
     // --- MÓDULO DE VENTAS: AGREGAR PRODUCTOS CON SELECT2 Y TABLA ---
     if (document.getElementById('product-search')) {
-        let lastProductResults = {};
         $('#product-search').select2({
             placeholder: 'Buscar producto por nombre',
             ajax: {
@@ -345,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     return { q: params.term };
                 },
                 processResults: function (data) {
-                    // Guardar los productos por id para acceso rápido
                     lastProductResults = {};
                     data.forEach(function(product) {
                         lastProductResults[product.id] = product;
@@ -356,7 +410,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 id: product.id,
                                 text: product.name,
                                 stock: product.stock,
-                                precio_publico: product.precio_publico
+                                precio_publico: product.precio_publico,
+                                precio_mayorista: product.precio_mayorista,
+                                precio_distribuidor: product.precio_distribuidor
                             };
                         })
                     };
@@ -380,20 +436,13 @@ document.addEventListener('DOMContentLoaded', function () {
             escapeMarkup: function (markup) { return markup; }
         });
 
-        let productsAdded = [];
-
         document.getElementById('add-product').addEventListener('click', function () {
             const select2Data = $('#product-search').select2('data')[0];
-            // DEBUG: Mostrar datos relevantes
-            console.log('select2Data:', select2Data);
-            console.log('lastProductResults:', lastProductResults);
             const product = lastProductResults[select2Data?.id];
-            console.log('product:', product);
             if (!select2Data) {
                 alert('Seleccione un producto');
                 return;
             }
-            // Buscar el producto en el último resultado AJAX para asegurar stock/precio
             if (!product || typeof product.stock === 'undefined' || typeof product.precio_publico === 'undefined') {
                 alert('No se pudo obtener el stock o precio del producto.');
                 return;
@@ -412,11 +461,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('La cantidad no puede ser mayor al stock disponible (' + product.stock + ')');
                 return;
             }
+            // Selecciona el precio según el rol del cliente
+            const precioUnitario = obtenerPrecioPorRol(product, clienteSeleccionado.role);
             productsAdded.push({
                 id: product.id,
                 name: product.name,
                 stock: product.stock,
-                price: product.precio_publico,
+                price: precioUnitario,
                 quantity: cantidad
             });
             renderProductsTable();
@@ -506,38 +557,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Error al procesar la venta. Por favor, intente nuevamente.');
             });
         });
-    }
 
-    // --- CLIENTE: BUSQUEDA AJAX CON SELECT2 EN VENTAS ---
-    if (document.getElementById('client-search')) {
-        $('#client-search').select2({
-            placeholder: 'Buscar cliente por nombre, email o RFC',
-            ajax: {
-                url: '/api/clients/search',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return { q: params.term };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(function (client) {
-                            // Asegúrate de que last_name esté presente
-                            return {
-                                id: client.id,
-                                text: (client.name || '') + ' ' + (client.last_name || '')
-                            };
-                        })
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 1,
-            width: '100%',
-            templateResult: function (data) {
-                return data.text;
-            },
-            escapeMarkup: function (markup) { return markup; }
-        });
+        // Función para actualizar los precios de los productos agregados si cambia el cliente
+        function actualizarPreciosPorRol() {
+            productsAdded.forEach((product, idx) => {
+                const lastProduct = lastProductResults[product.id];
+                if (lastProduct) {
+                    product.price = obtenerPrecioPorRol(lastProduct, clienteSeleccionado.role);
+                }
+            });
+            renderProductsTable();
+        }
     }
 });
