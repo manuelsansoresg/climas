@@ -65,4 +65,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Client routes
     Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);
+
+    // Sales routes
+    Route::get('sales', [App\Http\Controllers\Admin\SaleController::class, 'index'])->name('sales.index');
+    Route::get('sales/create', [App\Http\Controllers\Admin\SaleController::class, 'create'])->name('sales.create');
+    Route::post('sales', [App\Http\Controllers\Admin\SaleController::class, 'store'])->name('sales.store');
+    Route::get('sales/{sale}', [App\Http\Controllers\Admin\SaleController::class, 'show'])->name('sales.show');
+    Route::get('sales/reports/list', [App\Http\Controllers\Admin\SaleController::class, 'reports'])->name('sales.reports');
+});
+
+// API routes for product search
+Route::middleware(['auth'])->group(function () {
+    Route::get('/api/products/search', [App\Http\Controllers\Api\ProductController::class, 'search']);
 });

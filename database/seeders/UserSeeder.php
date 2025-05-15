@@ -18,5 +18,12 @@ class UserSeeder extends Seeder
         'email' => 'manuelsansoresg@gmail.com', 'password' => bcrypt('demor00txx'));
         $user = new User($data_user);
         $user->save();
+        $user->assignRole('Admin');
+
+        $data_user = array('name' => 'Alejandro',
+        'email' => 'jaculasd@gmail.com', 'password' => bcrypt('demor00txx'));
+        $user = new User($data_user);
+        $user->save();
+        $user->assignRole('Admin');
     }
 }

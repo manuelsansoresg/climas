@@ -154,6 +154,15 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
+                                            <label for="stock">Stock <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', 0) }}" required min="0">
+                                            @error('stock')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
                                             <label for="iva">IVA (%) <span class="text-danger">*</span></label>
                                             <input type="number" step="0.01" class="form-control @error('iva') is-invalid @enderror" id="iva" name="iva" value="{{ old('iva', 16) }}" required min="0" max="100">
                                             @error('iva')
@@ -205,19 +214,6 @@
                                                                 value="{{ $sucursal->id }}"
                                                                 {{ in_array($sucursal->id, old('sucursales', [])) ? 'checked' : '' }}>
                                                             <label class="custom-control-label" for="sucursal_{{ $sucursal->id }}">{{ $sucursal->name }}</label>
-                                                        </div>
-                                                        <div class="form-group mt-2">
-                                                            <label for="stock_{{ $sucursal->id }}">Stock</label>
-                                                            <input type="number" 
-                                                                class="form-control @error('stock_sucursal.'.$sucursal->id) is-invalid @enderror" 
-                                                                id="stock_{{ $sucursal->id }}"
-                                                                name="stock_sucursal[{{ $sucursal->id }}]" 
-                                                                placeholder="Ingrese el stock" 
-                                                                min="0"
-                                                                value="{{ old('stock_sucursal.'.$sucursal->id, 0) }}">
-                                                            @error('stock_sucursal.'.$sucursal->id)
-                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                            @enderror
                                                         </div>
                                                     </div>
                                                 @endforeach

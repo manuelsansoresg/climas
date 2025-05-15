@@ -331,4 +331,213 @@ document.addEventListener('DOMContentLoaded', function () {
             if (previewDiv) previewDiv.remove();
         }
     });
+
+    // --- MÓDULO DE VENTAS: AGREGAR PRODUCTOS CON SELECT2 Y TABLA ---
+    if (document.getElementById('product-search')) {
+        let lastProductResults = {};
+        $('#product-search').select2({
+            placeholder: 'Buscar producto por nombre',
+            ajax: {
+                url: '/api/products/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    // Guardar los productos por id para acceso rápido
+                    lastProductResults = {};
+                    data.forEach(function(product) {
+                        lastProductResults[product.id] = product;
+                    });
+                    return {
+                        results: data.map(function (product) {
+                            return {
+                                id: product.id,
+                                text: product.name,
+                                stock: product.stock,
+                                precio_publico: product.precio_publico
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            width: '100%',
+            templateResult: function (data) {
+                if (!data.id) return data.text;
+                var $container = $('<span></span>');
+                $container.text(data.text + ' ');
+                if (typeof data.stock !== 'undefined' && typeof data.precio_publico !== 'undefined') {
+                    $container.append(
+                        $('<span style="float:right;font-size:12px;color:#888;"></span>')
+                            .text('Stock: ' + data.stock + ' | $' + parseFloat(data.precio_publico).toFixed(2))
+                    );
+                }
+                return $container;
+            },
+            escapeMarkup: function (markup) { return markup; }
+        });
+
+        let productsAdded = [];
+
+        document.getElementById('add-product').addEventListener('click', function () {
+            const select2Data = $('#product-search').select2('data')[0];
+            // DEBUG: Mostrar datos relevantes
+            console.log('select2Data:', select2Data);
+            console.log('lastProductResults:', lastProductResults);
+            const product = lastProductResults[select2Data?.id];
+            console.log('product:', product);
+            if (!select2Data) {
+                alert('Seleccione un producto');
+                return;
+            }
+            // Buscar el producto en el último resultado AJAX para asegurar stock/precio
+            if (!product || typeof product.stock === 'undefined' || typeof product.precio_publico === 'undefined') {
+                alert('No se pudo obtener el stock o precio del producto.');
+                return;
+            }
+            if (productsAdded.find(p => p.id == product.id)) {
+                alert('Este producto ya fue agregado');
+                return;
+            }
+            let cantidad = prompt('Cantidad:', '1');
+            if (!cantidad || isNaN(cantidad) || cantidad < 1) {
+                alert('Cantidad inválida');
+                return;
+            }
+            cantidad = parseInt(cantidad);
+            if (cantidad > product.stock) {
+                alert('La cantidad no puede ser mayor al stock disponible (' + product.stock + ')');
+                return;
+            }
+            productsAdded.push({
+                id: product.id,
+                name: product.name,
+                stock: product.stock,
+                price: product.precio_publico,
+                quantity: cantidad
+            });
+            renderProductsTable();
+            $('#product-search').val(null).trigger('change');
+        });
+
+        function renderProductsTable() {
+            const tbody = document.querySelector('#products-table tbody');
+            tbody.innerHTML = '';
+            productsAdded.forEach((product, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <input type="hidden" name="products[${idx}][product_id]" value="${product.id}">
+                        ${product.name}
+                    </td>
+                    <td>
+                        <input type="number" name="products[${idx}][quantity]" value="${product.quantity}" min="1" max="${product.stock}" class="form-control form-control-sm quantity-input" data-idx="${idx}">
+                    </td>
+                    <td>${product.stock}</td>
+                    <td>$${parseFloat(product.price).toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-product" data-idx="${idx}">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.querySelector('#products-table').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-product')) {
+                const idx = e.target.getAttribute('data-idx');
+                productsAdded.splice(idx, 1);
+                renderProductsTable();
+            }
+        });
+
+        document.querySelector('#products-table').addEventListener('change', function (e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const idx = e.target.getAttribute('data-idx');
+                let value = parseInt(e.target.value);
+                if (isNaN(value) || value < 1) value = 1;
+                if (value > productsAdded[idx].stock) value = productsAdded[idx].stock;
+                productsAdded[idx].quantity = value;
+                e.target.value = value;
+            }
+        });
+
+        document.getElementById('saleForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            if (productsAdded.length === 0) {
+                alert('Debe agregar al menos un producto a la venta');
+                return;
+            }
+
+            // Crear FormData con todos los datos del formulario
+            const formData = new FormData(this);
+            
+            // Agregar los productos al FormData
+            productsAdded.forEach((product, idx) => {
+                formData.append(`products[${idx}][product_id]`, product.id);
+                formData.append(`products[${idx}][quantity]`, product.quantity);
+            });
+
+            // Enviar la solicitud
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect || '/admin/sales';
+                } else {
+                    alert(data.message || 'Error al crear la venta');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar la venta. Por favor, intente nuevamente.');
+            });
+        });
+    }
+
+    // --- CLIENTE: BUSQUEDA AJAX CON SELECT2 EN VENTAS ---
+    if (document.getElementById('client-search')) {
+        $('#client-search').select2({
+            placeholder: 'Buscar cliente por nombre, email o RFC',
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (client) {
+                            // Asegúrate de que last_name esté presente
+                            return {
+                                id: client.id,
+                                text: (client.name || '') + ' ' + (client.last_name || '')
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            width: '100%',
+            templateResult: function (data) {
+                return data.text;
+            },
+            escapeMarkup: function (markup) { return markup; }
+        });
+    }
 });

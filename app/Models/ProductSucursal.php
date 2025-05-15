@@ -13,8 +13,7 @@ class ProductSucursal extends Model
 
     protected $fillable = [
         'product_id',
-        'sucursal_id',
-        'stock'
+        'sucursal_id'
     ];
 
     public function product()

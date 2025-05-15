@@ -138,4 +138,21 @@ class ClientController extends Controller
         return redirect()->route('admin.clients.index')
             ->with('success', 'Cliente eliminado exitosamente.');
     }
+
+    /**
+     * Búsqueda AJAX para Select2 en ventas
+     */
+    public function search(Request $request)
+    {
+        $q = $request->get('q');
+        $clients = User::role(['Cliente mayorista', 'Cliente publico en general', 'Cliente instalador'])
+            ->where(function($query) use ($q) {
+                $query->where('name', 'like', "%$q%")
+                      ->orWhere('email', 'like', "%$q%")
+                      ->orWhere('rfc', 'like', "%$q%") ;
+            })
+            ->take(10)
+            ->get(['id', 'name', 'last_name', 'email', 'rfc']);
+        return response()->json($clients);
+    }
 }

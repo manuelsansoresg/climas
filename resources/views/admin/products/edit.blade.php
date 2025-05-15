@@ -152,6 +152,15 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
+                                            <label for="stock">Stock <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', $product->stock) }}" required min="0">
+                                            @error('stock')
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
                                             <label for="iva">IVA (%) <span class="text-danger">*</span></label>
                                             <input type="number" step="0.01" class="form-control @error('iva') is-invalid @enderror" id="iva" name="iva" value="{{ old('iva', $product->iva) }}" required min="0" max="100">
                                             @error('iva')
@@ -205,15 +214,18 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Sucursales</label>
+                                            <label>Sucursales <span class="text-danger">*</span></label>
                                             <div class="row">
                                                 @foreach($sucursales as $sucursal)
                                                     <div class="col-md-4">
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="sucursal_{{ $sucursal->id }}" name="sucursales[]" value="{{ $sucursal->id }}" {{ in_array($sucursal->id, $selectedSucursales) ? 'checked' : '' }}>
+                                                            <input type="checkbox" class="custom-control-input" 
+                                                                id="sucursal_{{ $sucursal->id }}" 
+                                                                name="sucursales[]" 
+                                                                value="{{ $sucursal->id }}" 
+                                                                {{ in_array($sucursal->id, $selectedSucursales) ? 'checked' : '' }}>
                                                             <label class="custom-control-label" for="sucursal_{{ $sucursal->id }}">{{ $sucursal->name }}</label>
                                                         </div>
-                                                        <input type="number" class="form-control mt-2" name="stock_sucursal[{{ $sucursal->id }}]" placeholder="Stock" min="0" value="{{ $stockSucursales[$sucursal->id] ?? 0 }}">
                                                     </div>
                                                 @endforeach
                                             </div>

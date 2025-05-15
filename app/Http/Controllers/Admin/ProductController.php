@@ -47,14 +47,14 @@ class ProductController extends Controller
                 'precio_distribuidor' => 'nullable|numeric|min:0',
                 'precio_publico' => 'required|numeric|min:0',
                 'costo_compra' => 'nullable|numeric|min:0',
+                'stock' => 'required|integer|min:0',
                 'iva' => 'required|numeric|min:0|max:100',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'pdf' => 'nullable|mimes:pdf|max:10240',
                 'status' => 'required|boolean',
                 'sucursales' => 'required|array',
-                'sucursales.*' => 'exists:sucursales,id',
-                'stock_sucursal.*' => 'required|integer|min:0'
+                'sucursales.*' => 'exists:sucursales,id'
             ], [
                 'name.required' => 'El nombre del producto es obligatorio',
                 'name.max' => 'El nombre no puede tener más de 255 caracteres',
@@ -72,6 +72,9 @@ class ProductController extends Controller
                 'precio_publico.min' => 'El precio público no puede ser negativo',
                 'costo_compra.numeric' => 'El costo de compra debe ser un número',
                 'costo_compra.min' => 'El costo de compra no puede ser negativo',
+                'stock.required' => 'El stock es obligatorio',
+                'stock.integer' => 'El stock debe ser un número entero',
+                'stock.min' => 'El stock no puede ser negativo',
                 'iva.required' => 'El IVA es obligatorio',
                 'iva.numeric' => 'El IVA debe ser un número',
                 'iva.min' => 'El IVA no puede ser negativo',
@@ -87,10 +90,7 @@ class ProductController extends Controller
                 'pdf.max' => 'El archivo PDF no puede pesar más de 10MB',
                 'status.required' => 'Debe seleccionar un estado',
                 'sucursales.required' => 'Debe seleccionar al menos una sucursal',
-                'sucursales.*.exists' => 'Una de las sucursales seleccionadas no es válida',
-                'stock_sucursal.*.required' => 'Debe especificar el stock para cada sucursal seleccionada',
-                'stock_sucursal.*.integer' => 'El stock debe ser un número entero',
-                'stock_sucursal.*.min' => 'El stock no puede ser negativo'
+                'sucursales.*.exists' => 'Una de las sucursales seleccionadas no es válida'
             ]);
 
             // Crear el producto
@@ -105,6 +105,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->costo_compra = $request->costo_compra;
+            $product->stock = $request->stock;
             $product->iva = $request->iva;
             $product->status = $request->status;
 
@@ -139,15 +140,8 @@ class ProductController extends Controller
                 }
             }
 
-            // Guardar sucursales y stock
-            foreach ($request->sucursales as $sucursalId) {
-                $stock = $request->input('stock_sucursal.' . $sucursalId, 0);
-                ProductSucursal::create([
-                    'product_id' => $product->id,
-                    'sucursal_id' => $sucursalId,
-                    'stock' => $stock
-                ]);
-            }
+            // Guardar sucursales sin stock
+            $product->sucursales()->attach($request->sucursales);
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Producto creado exitosamente');
@@ -210,14 +204,14 @@ class ProductController extends Controller
             'precio_distribuidor' => 'nullable|numeric|min:0',
             'precio_publico' => 'required|numeric|min:0',
             'costo_compra' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
             'iva' => 'required|numeric|min:0|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pdf' => 'nullable|mimes:pdf|max:10240',
             'status' => 'required|boolean',
             'sucursales' => 'required|array',
-            'sucursales.*' => 'exists:sucursales,id',
-            'stock_sucursal.*' => 'required|integer|min:0'
+            'sucursales.*' => 'exists:sucursales,id'
         ]);
 
         try {
@@ -233,6 +227,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->costo_compra = $request->costo_compra;
+            $product->stock = $request->stock;
             $product->iva = $request->iva;
             $product->status = $request->status;
 
@@ -277,16 +272,8 @@ class ProductController extends Controller
                 }
             }
 
-            // Actualizar sucursales y stock
-            $product->productSucursales()->delete(); // Eliminar relaciones anteriores
-            foreach ($request->sucursales as $sucursalId) {
-                $stock = $request->input('stock_sucursal.' . $sucursalId, 0);
-                ProductSucursal::create([
-                    'product_id' => $product->id,
-                    'sucursal_id' => $sucursalId,
-                    'stock' => $stock
-                ]);
-            }
+            // Actualizar sucursales sin stock
+            $product->sucursales()->sync($request->sucursales);
 
             DB::commit();
             return redirect()->route('admin.products.index')->with('success', 'Producto actualizado exitosamente');
