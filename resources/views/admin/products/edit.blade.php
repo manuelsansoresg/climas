@@ -150,6 +150,15 @@
                                             @enderror
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="iva">IVA (%) <span class="text-danger">*</span></label>
+                                            <input type="number" step="0.01" class="form-control @error('iva') is-invalid @enderror" id="iva" name="iva" value="{{ old('iva', $product->iva) }}" required min="0" max="100">
+                                            @error('iva')
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">

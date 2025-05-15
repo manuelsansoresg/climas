@@ -20,6 +20,7 @@ class Product extends Model
         'costo_compra',
         'stock',
         'discount',
+        'iva',
         'category_id',
         'subcategory_id',
         'subcategory2_id',

@@ -17,7 +17,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = User::role('Cliente')->get();
+        $clients = User::role(['Cliente mayorista', 'Cliente publico en general', 'Cliente instalador'])->get();
         return view('admin.clients.index', compact('clients'));
     }
 
@@ -46,13 +46,21 @@ class ClientController extends Controller
             'phone' => 'required|string|max:20',
             'rfc' => 'required|string|max:13',
             'address' => 'required|string',
+            'cp' => 'string|max:5',
+            'client_type' => 'required_if:is_admin,true|string|in:Cliente mayorista,Cliente publico en general,Cliente instalador',
         ]);
 
         $user = User::create($validated);
         
-        // Asignar el rol de Cliente
-        $clientRole = Role::firstOrCreate(['name' => 'Cliente']);
-        $user->assignRole($clientRole);
+        // Asignar el rol según el tipo de cliente
+        if ($request->user()->roles()->where('name', 'Admin')->exists() && isset($validated['client_type'])) {
+            $clientRole = Role::firstOrCreate(['name' => $validated['client_type']]);
+            $user->assignRole($clientRole);
+        } else {
+            // Si no es admin o no se especificó tipo, asignar rol por defecto
+            $clientRole = Role::firstOrCreate(['name' => 'Cliente publico en general']);
+            $user->assignRole($clientRole);
+        }
 
         return redirect()->route('admin.clients.index')
             ->with('success', 'Cliente creado exitosamente.');
@@ -96,9 +104,21 @@ class ClientController extends Controller
             'phone' => 'required|string|max:20',
             'rfc' => 'required|string|max:13',
             'address' => 'required|string',
+            'cp' => 'string|max:5',
+            'client_type' => 'required_if:is_admin,true|string|in:Cliente mayorista,Cliente publico en general,Cliente instalador',
         ]);
 
         $client->update($validated);
+
+        // Actualizar el rol si el usuario es admin
+        if ($request->user()->roles()->where('name', 'Admin')->exists() && isset($validated['client_type'])) {
+            // Remover todos los roles actuales
+            $client->roles()->detach();
+            
+            // Asignar el nuevo rol
+            $clientRole = Role::firstOrCreate(['name' => $validated['client_type']]);
+            $client->assignRole($clientRole);
+        }
 
         return redirect()->route('admin.clients.index')
             ->with('success', 'Cliente actualizado exitosamente.');
@@ -113,7 +133,6 @@ class ClientController extends Controller
     public function destroy(User $client)
     {
         // Remover el rol de Cliente antes de eliminar
-        $client->removeRole('Cliente');
         $client->delete();
 
         return redirect()->route('admin.clients.index')

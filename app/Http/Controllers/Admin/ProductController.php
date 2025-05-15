@@ -47,6 +47,7 @@ class ProductController extends Controller
                 'precio_distribuidor' => 'nullable|numeric|min:0',
                 'precio_publico' => 'required|numeric|min:0',
                 'costo_compra' => 'nullable|numeric|min:0',
+                'iva' => 'required|numeric|min:0|max:100',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'pdf' => 'nullable|mimes:pdf|max:10240',
@@ -71,6 +72,10 @@ class ProductController extends Controller
                 'precio_publico.min' => 'El precio público no puede ser negativo',
                 'costo_compra.numeric' => 'El costo de compra debe ser un número',
                 'costo_compra.min' => 'El costo de compra no puede ser negativo',
+                'iva.required' => 'El IVA es obligatorio',
+                'iva.numeric' => 'El IVA debe ser un número',
+                'iva.min' => 'El IVA no puede ser negativo',
+                'iva.max' => 'El IVA no puede ser mayor que 100',
                 'image.required' => 'La imagen principal es obligatoria',
                 'image.image' => 'El archivo debe ser una imagen',
                 'image.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif',
@@ -100,6 +105,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->costo_compra = $request->costo_compra;
+            $product->iva = $request->iva;
             $product->status = $request->status;
 
             // Guardar imagen principal
@@ -204,6 +210,7 @@ class ProductController extends Controller
             'precio_distribuidor' => 'nullable|numeric|min:0',
             'precio_publico' => 'required|numeric|min:0',
             'costo_compra' => 'nullable|numeric|min:0',
+            'iva' => 'required|numeric|min:0|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pdf' => 'nullable|mimes:pdf|max:10240',
@@ -226,6 +233,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->costo_compra = $request->costo_compra;
+            $product->iva = $request->iva;
             $product->status = $request->status;
 
             // Actualizar imagen principal si se proporciona una nueva

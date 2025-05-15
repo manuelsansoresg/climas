@@ -43,6 +43,7 @@
                                         <th>Email</th>
                                         <th>Teléfono</th>
                                         <th>RFC</th>
+                                        <th>Tipo de Cliente</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -54,6 +55,7 @@
                                         <td>{{ $client->email }}</td>
                                         <td>{{ $client->phone }}</td>
                                         <td>{{ $client->rfc }}</td>
+                                        <td>{{ $client->roles->first()->name ?? 'No asignado' }}</td>
                                         <td>
                                             <a href="{{ route('admin.clients.edit', $client) }}" class="btn btn-info btn-sm">
                                                 <i class="fas fa-edit"></i>

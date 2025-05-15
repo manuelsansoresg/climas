@@ -57,6 +57,13 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
+                                <div class="form-group">
+                                    <label for="phone">CP</label>
+                                    <input type="text" class="form-control @error('cp') is-invalid @enderror" id="cp" name="cp" value="{{ old('cp') }}">
+                                    @error('cp')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
                                 <div class="form-group">
                                     <label for="rfc">RFC</label>
@@ -73,6 +80,21 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
+
+                                @if(auth()->user()->hasRole('Admin'))
+                                <div class="form-group">
+                                    <label for="client_type">Tipo de Cliente</label>
+                                    <select class="form-control @error('client_type') is-invalid @enderror" id="client_type" name="client_type" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option value="Cliente mayorista" {{ old('client_type') == 'Cliente mayorista' ? 'selected' : '' }}>Cliente público en general</option>
+                                        <option value="Cliente publico en general" {{ old('client_type') == 'Cliente publico en general' ? 'selected' : '' }}>Cliente mayorista</option>
+                                        <option value="Cliente instalador" {{ old('client_type') == 'Cliente instalador' ? 'selected' : '' }}>Cliente instalador</option>
+                                    </select>
+                                    @error('client_type')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                @endif
 
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
