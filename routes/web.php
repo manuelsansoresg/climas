@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ProductReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -72,6 +73,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('sales', [App\Http\Controllers\Admin\SaleController::class, 'store'])->name('sales.store');
     Route::get('sales/{sale}', [App\Http\Controllers\Admin\SaleController::class, 'show'])->name('sales.show');
     Route::get('sales/reports/list', [App\Http\Controllers\Admin\SaleController::class, 'reports'])->name('sales.reports');
+
+    // Reportes personalizados
+    Route::get('reports/products', [ProductReportController::class, 'index'])->name('reports.products');
+    Route::get('reports/stock',[ProductReportController::class, 'stock'])->name('reports.stock');
 });
 
 // API routes for product search

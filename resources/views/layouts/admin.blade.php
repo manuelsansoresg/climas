@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css?ver=3.2.4') }}">
+    @livewireStyles
 </head>
 
 <body class="nk-body bg-lighter npc-default has-sidebar ">
@@ -57,12 +58,20 @@
                                         <span class="nk-menu-text">Salidas</span>
                                     </a>
                                 </li><!-- .nk-menu-item -->
-                                <li class="nk-menu-item">
-                                    <a href="#" class="nk-menu-link">
+                                <li class="nk-menu-item has-sub">
+                                    <a href="#" class="nk-menu-link nk-menu-toggle">
                                         <span class="nk-menu-icon"><em class="icon ni ni-growth-fill"></em></span>
                                         <span class="nk-menu-text">Reportes</span>
                                     </a>
-                                </li><!-- .nk-menu-item -->
+                                    <ul class="nk-menu-sub">
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.reports.products') }}" class="nk-menu-link"><span class="nk-menu-text">Reporte de Productos</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.reports.stock') }}" class="nk-menu-link"><span class="nk-menu-text">Reporte de Stock</span></a>
+                                        </li>
+                                    </ul>
+                                </li>
                                 <li class="nk-menu-heading">
                                     <h6 class="overline-title text-primary-alt">Administración</h6>
                                 </li><!-- .nk-menu-heading -->
@@ -879,11 +888,7 @@
     <script src="/assets/js/charts/chart-ecommerce.js?ver=3.2.4"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/app.js?v=1.0.0') }}"></script>
-
-    
-
-
-
+    @livewireScripts
 </body>
 
 </html>
