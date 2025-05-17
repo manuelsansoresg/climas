@@ -22,6 +22,11 @@ class ProductReportController extends Controller
         return view('admin.reports.stock');
     }
 
+    public function sales()
+    {
+        return view('admin.reports.sales');
+    }
+
     /**
      * Show the form for creating a new resource.
      *

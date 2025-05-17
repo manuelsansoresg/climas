@@ -77,6 +77,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Reportes personalizados
     Route::get('reports/products', [ProductReportController::class, 'index'])->name('reports.products');
     Route::get('reports/stock',[ProductReportController::class, 'stock'])->name('reports.stock');
+    Route::get('reports/ventas',[ProductReportController::class, 'sales'])->name('reports.sales');
 });
 
 // API routes for product search
