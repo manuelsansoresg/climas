@@ -17,7 +17,7 @@ class Product extends Model
         'precio_mayorista',
         'precio_distribuidor',
         'precio_publico',
-        'costo_compra',
+        'precio_instalador',
         'stock',
         'discount',
         'iva',
@@ -63,5 +63,15 @@ class Product extends Model
     public function productSucursales()
     {
         return $this->hasMany(ProductSucursal::class);
+    }
+
+    public function warehouses()
+    {
+        return $this->hasMany(WareHouse::class);
+    }
+
+    public function saleDetails()
+    {
+        return $this->hasMany(SaleDetail::class);
     }
 }

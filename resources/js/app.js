@@ -569,4 +569,35 @@ document.addEventListener('DOMContentLoaded', function () {
             renderProductsTable();
         }
     }
+
+    // Inicializar Select2 para búsqueda de productos (forzado con setTimeout para asegurar que el select esté en el DOM)
+    setTimeout(function() {
+        if ($('#product_id').length) {
+            console.log('Inicializando Select2 para #product_id');
+            $('#product_id').select2({
+                placeholder: 'Buscar producto...',
+                allowClear: true,
+                ajax: {
+                    url: '/api/products/search',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { q: params.term };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.map(function(item) {
+                                return { id: item.id, text: item.name };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                width: '100%'
+            });
+        } else {
+            console.log('No se encontró #product_id al inicializar Select2');
+        }
+    }, 1000);
 });

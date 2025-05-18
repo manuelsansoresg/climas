@@ -19,5 +19,6 @@ class RolesSeeder extends Seeder
         Role::create(['name' => 'Cliente mayorista']);
         Role::create(['name' => 'Cliente publico en general']);
         Role::create(['name' => 'Cliente instalador']);
+        Role::create(['name' => 'Proveedor']);
     }
 }

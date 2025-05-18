@@ -46,7 +46,7 @@ class ProductController extends Controller
                 'precio_mayorista' => 'nullable|numeric|min:0',
                 'precio_distribuidor' => 'nullable|numeric|min:0',
                 'precio_publico' => 'required|numeric|min:0',
-                'costo_compra' => 'nullable|numeric|min:0',
+                'precio_instalador' => 'nullable|numeric|min:0',
                 'stock' => 'required|integer|min:0',
                 'iva' => 'required|numeric|min:0|max:100',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -70,8 +70,8 @@ class ProductController extends Controller
                 'precio_publico.required' => 'El precio público es obligatorio',
                 'precio_publico.numeric' => 'El precio público debe ser un número',
                 'precio_publico.min' => 'El precio público no puede ser negativo',
-                'costo_compra.numeric' => 'El costo de compra debe ser un número',
-                'costo_compra.min' => 'El costo de compra no puede ser negativo',
+                'precio_instalador.numeric' => 'El precio instalador debe ser un número',
+                'precio_instalador.min' => 'El precio instalador no puede ser negativo',
                 'stock.required' => 'El stock es obligatorio',
                 'stock.integer' => 'El stock debe ser un número entero',
                 'stock.min' => 'El stock no puede ser negativo',
@@ -104,7 +104,7 @@ class ProductController extends Controller
             $product->precio_mayorista = $request->precio_mayorista;
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
-            $product->costo_compra = $request->costo_compra;
+            $product->precio_instalador = $request->precio_instalador;
             $product->stock = $request->stock;
             $product->iva = $request->iva;
             $product->status = $request->status;
@@ -203,7 +203,7 @@ class ProductController extends Controller
             'precio_mayorista' => 'nullable|numeric|min:0',
             'precio_distribuidor' => 'nullable|numeric|min:0',
             'precio_publico' => 'required|numeric|min:0',
-            'costo_compra' => 'nullable|numeric|min:0',
+            'precio_instalador' => 'nullable|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'iva' => 'required|numeric|min:0|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -226,7 +226,7 @@ class ProductController extends Controller
             $product->precio_mayorista = $request->precio_mayorista;
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
-            $product->costo_compra = $request->costo_compra;
+            $product->precio_instalador = $request->precio_instalador;
             $product->stock = $request->stock;
             $product->iva = $request->iva;
             $product->status = $request->status;

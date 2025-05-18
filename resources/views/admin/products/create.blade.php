@@ -145,9 +145,9 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="costo_compra">Costo de Compra</label>
-                                            <input type="number" step="0.01" class="form-control @error('costo_compra') is-invalid @enderror" id="costo_compra" name="costo_compra" value="{{ old('costo_compra') }}">
-                                            @error('costo_compra')
+                                            <label for="precio_instalador">Precio instalador</label>
+                                            <input type="number" step="0.01" class="form-control @error('precio_instalador') is-invalid @enderror" id="precio_instalador" name="precio_instalador" value="{{ old('precio_instalador') }}">
+                                            @error('precio_instalador')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

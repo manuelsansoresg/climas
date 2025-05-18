@@ -117,6 +117,13 @@
                                     </a>
                                 </li><!-- .nk-menu-item -->
 
+                                <li class="nk-menu-item">
+                                    <a href="/admin/warehouses" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-package"></em></span>
+                                        <span class="nk-menu-text">Almacén</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
+
                                 <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
                                         <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>

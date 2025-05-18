@@ -78,6 +78,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('reports/products', [ProductReportController::class, 'index'])->name('reports.products');
     Route::get('reports/stock',[ProductReportController::class, 'stock'])->name('reports.stock');
     Route::get('reports/ventas',[ProductReportController::class, 'sales'])->name('reports.sales');
+
+    // Warehouse routes
+    Route::resource('warehouses', \App\Http\Controllers\Admin\WareHouseController::class);
+    Route::post('warehouses/{id}/restore', [\App\Http\Controllers\Admin\WareHouseController::class, 'restore'])->name('warehouses.restore');
 });
 
 // API routes for product search
