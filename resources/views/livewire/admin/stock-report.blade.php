@@ -92,10 +92,10 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Producto</th>
-                                            <th>Categoría</th>
+                                          {{--   <th>Categoría</th>
                                             <th>Subcategoría</th>
                                             <th>Subcategoría 2</th>
-                                            <th>Subcategoría 3</th>
+                                            <th>Subcategoría 3</th> --}}
                                             <th>Factura</th>
                                             <th>Serie</th>
                                             <th>Fecha Ingreso</th>
@@ -112,10 +112,10 @@
                                             <tr>
                                                 <td>{{ $entry->id }}</td>
                                                 <td>{{ $entry->product->name }}</td>
-                                                <td>{{ $entry->product->category->name ?? 'N/A' }}</td>
+                                              {{--   <td>{{ $entry->product->category->name ?? 'N/A' }}</td>
                                                 <td>{{ $entry->product->subcategory->name ?? 'N/A' }}</td>
                                                 <td>{{ $entry->product->subcategory2->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->product->subcategory3->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->product->subcategory3->name ?? 'N/A' }}</td> --}}
                                                 <td>{{ $entry->factura }}</td>
                                                 <td>{{ $entry->serie }}</td>
                                                 <td>{{ $entry->fechaingresa }}</td>
