@@ -91,30 +91,44 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Nombre</th>
+                                            <th>Producto</th>
                                             <th>Categoría</th>
                                             <th>Subcategoría</th>
                                             <th>Subcategoría 2</th>
                                             <th>Subcategoría 3</th>
-                                            <th>Cantidad Vendida</th>
+                                            <th>Factura</th>
+                                            <th>Serie</th>
+                                            <th>Fecha Ingreso</th>
+                                            <th>Costo Compra</th>
+                                            <th>Proveedor</th>
+                                            <th>Usuario</th>
+                                            <th>Cantidad</th>
+                                            <th>Vendidos</th>
                                             <th>Stock Restante</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($products as $product)
+                                        @forelse($warehouseEntries as $entry)
                                             <tr>
-                                                <td>{{ $product->id }}</td>
-                                                <td>{{ $product->name }}</td>
-                                                <td>{{ $product->category->name ?? 'N/A' }}</td>
-                                                <td>{{ $product->subcategory->name ?? 'N/A' }}</td>
-                                                <td>{{ $product->subcategory2->name ?? 'N/A' }}</td>
-                                                <td>{{ $product->subcategory3->name ?? 'N/A' }}</td>
-                                                <td>{{ $product->vendidos }}</td>
-                                                <td>{{ $product->stock_restante }}</td>
+                                                <td>{{ $entry->id }}</td>
+                                                <td>{{ $entry->product->name }}</td>
+                                                <td>{{ $entry->product->category->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->product->subcategory->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->product->subcategory2->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->product->subcategory3->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->factura }}</td>
+                                                <td>{{ $entry->serie }}</td>
+                                                <td>{{ $entry->fechaingresa }}</td>
+                                                <td>{{ $entry->costo_compra }}</td>
+                                                <td>{{ $entry->provider->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->user->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->cantidad }}</td>
+                                                <td>{{ $entry->vendidos }}</td>
+                                                <td>{{ $entry->stock_restante }}</td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="8" class="text-center">No hay productos para mostrar.</td>
+                                                <td colspan="15" class="text-center">No hay registros para mostrar.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

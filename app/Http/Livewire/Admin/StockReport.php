@@ -9,7 +9,9 @@ use App\Models\Subcategory;
 use App\Models\Subcategory2;
 use App\Models\Subcategory3;
 use App\Models\SaleDetail;
+use App\Models\WareHouse;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StockReport extends Component
 {
@@ -69,30 +71,52 @@ class StockReport extends Component
         $subcategories2 = $this->filters['subcategory_id'] ? Subcategory2::where('subcategory_id', $this->filters['subcategory_id'])->get() : collect();
         $subcategories3 = $this->filters['subcategory2_id'] ? Subcategory3::where('subcategory2_id', $this->filters['subcategory2_id'])->get() : collect();
 
-        $products = Product::query()
-            ->when($this->appliedFilters['category_id'], fn($q) => $q->where('category_id', $this->appliedFilters['category_id']))
-            ->when($this->appliedFilters['subcategory_id'] && $this->appliedFilters['category_id'], fn($q) => $q->where('subcategory_id', $this->appliedFilters['subcategory_id']))
-            ->when($this->appliedFilters['subcategory2_id'] && $this->appliedFilters['subcategory_id'], fn($q) => $q->where('subcategory2_id', $this->appliedFilters['subcategory2_id']))
-            ->when($this->appliedFilters['subcategory3_id'] && $this->appliedFilters['subcategory2_id'], fn($q) => $q->where('subcategory3_id', $this->appliedFilters['subcategory3_id']))
-            ->when($this->appliedFilters['name'], fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($this->appliedFilters['name']) . '%']))
-            ->when($this->appliedFilters['date_from'], fn($q) => $q->whereDate('created_at', '>=', $this->appliedFilters['date_from']))
-            ->when($this->appliedFilters['date_to'], fn($q) => $q->whereDate('created_at', '<=', $this->appliedFilters['date_to']))
-            ->with(['category', 'subcategory', 'subcategory2', 'subcategory3'])
-            ->get();
-
-        // Calcular vendidos y stock restante
         $dateFrom = $this->appliedFilters['date_from'] ? Carbon::parse($this->appliedFilters['date_from'])->startOfDay() : null;
         $dateTo = $this->appliedFilters['date_to'] ? Carbon::parse($this->appliedFilters['date_to'])->endOfDay() : null;
-        $products = $products->map(function($product) use ($dateFrom, $dateTo) {
-            $query = SaleDetail::where('product_id', $product->id);
-            if ($dateFrom) $query->whereHas('sale', fn($q) => $q->where('created_at', '>=', $dateFrom));
-            if ($dateTo) $query->whereHas('sale', fn($q) => $q->where('created_at', '<=', $dateTo));
-            $vendidos = $query->sum('quantity');
-            $product->vendidos = $vendidos;
-            $product->stock_restante = $product->stock;
-            return $product;
-        });
 
-        return view('livewire.admin.stock-report', compact('categories', 'subcategories', 'subcategories2', 'subcategories3', 'products'));
+        $warehouseEntries = WareHouse::query()
+            ->with(['product.category', 'product.subcategory', 'product.subcategory2', 'product.subcategory3', 'user', 'provider'])
+            ->when($this->appliedFilters['category_id'], function($q) {
+                $q->whereHas('product', fn($q) => $q->where('category_id', $this->appliedFilters['category_id']));
+            })
+            ->when($this->appliedFilters['subcategory_id'], function($q) {
+                $q->whereHas('product', fn($q) => $q->where('subcategory_id', $this->appliedFilters['subcategory_id']));
+            })
+            ->when($this->appliedFilters['subcategory2_id'], function($q) {
+                $q->whereHas('product', fn($q) => $q->where('subcategory2_id', $this->appliedFilters['subcategory2_id']));
+            })
+            ->when($this->appliedFilters['subcategory3_id'], function($q) {
+                $q->whereHas('product', fn($q) => $q->where('subcategory3_id', $this->appliedFilters['subcategory3_id']));
+            })
+            ->when($this->appliedFilters['name'], function($q) {
+                $q->whereHas('product', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($this->appliedFilters['name']) . '%']));
+            })
+            ->when($dateFrom, function($q) use ($dateFrom) {
+                $q->where('fechaingresa', '>=', $dateFrom);
+            })
+            ->when($dateTo, function($q) use ($dateTo) {
+                $q->where('fechaingresa', '<=', $dateTo);
+            })
+            ->orderBy('fechaingresa', 'asc')
+            ->get()
+            ->groupBy('product_id')
+            ->map(function($productEntries, $productId) {
+                // Obtener el total vendido para este producto (en el rango de fechas de venta si se quiere)
+                $totalVendidos = SaleDetail::where('product_id', $productId)->sum('quantity');
+                $vendidosRestantes = $totalVendidos;
+                $processedEntries = collect();
+                foreach ($productEntries as $entry) {
+                    $entryStock = $entry->cantidad;
+                    $entryVendidos = min($vendidosRestantes, $entryStock);
+                    $entry->vendidos = $entryVendidos;
+                    $entry->stock_restante = $entryStock - $entryVendidos;
+                    $vendidosRestantes -= $entryVendidos;
+                    $processedEntries->push($entry);
+                }
+                return $processedEntries;
+            })
+            ->flatten();
+
+        return view('livewire.admin.stock-report', compact('categories', 'subcategories', 'subcategories2', 'subcategories3', 'warehouseEntries'));
     }
 }

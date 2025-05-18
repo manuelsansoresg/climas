@@ -33,6 +33,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Producto</th>
                                         <th>Factura</th>
                                         <th>Serie</th>
@@ -46,6 +47,7 @@
                                 <tbody>
                                     @foreach($warehouses as $warehouse)
                                     <tr>
+                                        <td>{{ $warehouse->id }}</td>
                                         <td>{{ $warehouse->product->name }}</td>
                                         <td>{{ $warehouse->factura }}</td>
                                         <td>{{ $warehouse->serie }}</td>
