@@ -55,7 +55,7 @@
                                                 <td>{{ $sucursal->phone }}</td>
                                                 <td>{{ $sucursal->email }}</td>
                                                 <td>
-                                                    <span class="badge badge-{{ $sucursal->status ? 'success' : 'danger' }}">
+                                                    <span class="badge bg-{{ $sucursal->status ? 'success' : 'danger' }}">
                                                         {{ $sucursal->status ? 'Activo' : 'Inactivo' }}
                                                     </span>
                                                 </td>

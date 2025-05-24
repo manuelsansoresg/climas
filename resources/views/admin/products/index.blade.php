@@ -61,7 +61,7 @@
                                             <td>${{ number_format($product->precio_publico, 2) }}</td>
                                             <td>{{ $product->stock }}</td>
                                             <td>
-                                                <span class="badge badge-{{ $product->status ? 'success' : 'danger' }}">
+                                                <span class="badge bg-{{ $product->status ? 'success' : 'danger' }}">
                                                     {{ $product->status ? 'Activo' : 'Inactivo' }}
                                                 </span>
                                             </td>
