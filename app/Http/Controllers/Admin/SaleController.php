@@ -50,8 +50,7 @@ class SaleController extends Controller
                 if ($product->stock < $item['quantity']) {
                     throw new \Exception("Stock insuficiente para el producto: {$product->name}");
                 }
-                
-                $price = $this->getPriceByUserRole($product);
+                $price = $this->getPriceByUserRole($product, $request->client_id);
                 $itemSubtotal = $price * $item['quantity'];
                 $itemIva = $itemSubtotal * ($product->iva / 100);
                 
@@ -72,11 +71,10 @@ class SaleController extends Controller
                 'status' => 'completed',
                 'payment_status' => 'paid'
             ]);
-
             // Create sale details
             foreach ($request->products as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                $price = $this->getPriceByUserRole($product);
+                $price = $this->getPriceByUserRole($product, $request->client_id);
                 $itemSubtotal = $price * $item['quantity'];
                 $itemIva = $itemSubtotal * ($product->iva / 100);
 
@@ -131,9 +129,9 @@ class SaleController extends Controller
         return view('admin.sales.reports', compact('sales', 'totalSales', 'totalRevenue', 'averageSale'));
     }
 
-    private function getPriceByUserRole($product)
+    private function getPriceByUserRole($product, $userId = null)
     {
-        $user = auth()->user();
+        $user = $userId == null ? auth()->user() : User::find($userId);
         if (!$user || !($user instanceof \App\Models\User)) {
             return $product->precio_publico;
         }
@@ -141,7 +139,7 @@ class SaleController extends Controller
             return $product->precio_mayorista;
         }
         if ($user->hasRole('Cliente instalador')) {
-            return $product->precio_publico * 0.9; // 10% discount for installers
+            return $product->precio_instalador * 0.9; // 10% discount for installers
         }
         return $product->precio_publico;
     }

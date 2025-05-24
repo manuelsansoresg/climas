@@ -70,6 +70,9 @@
                                         <li class="nk-menu-item">
                                             <a href="{{ route('admin.reports.stock') }}" class="nk-menu-link"><span class="nk-menu-text">Reporte de Stock</span></a>
                                         </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ route('admin.reports.sales') }}" class="nk-menu-link"><span class="nk-menu-text">Reporte de Ventas</span></a>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li class="nk-menu-heading">
@@ -123,8 +126,15 @@
                                         <span class="nk-menu-text">Almacén</span>
                                     </a>
                                 </li><!-- .nk-menu-item -->
+                               
+                                <li class="nk-menu-item">
+                                    <a href="/admin/sales/create" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>
+                                        <span class="nk-menu-text">Ventas</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
 
-                                <li class="nk-menu-item has-sub">
+                                {{-- <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">
                                         <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>
                                         <span class="nk-menu-text">Ventas</span>
@@ -140,7 +150,7 @@
                                             <a href="/admin/sales/reports/list" class="nk-menu-link"><span class="nk-menu-text">Reportes de Ventas</span></a>
                                         </li>
                                     </ul><!-- .nk-menu-sub -->
-                                </li><!-- .nk-menu-item -->
+                                </li><!-- .nk-menu-item --> --}}
 
                                 
                                

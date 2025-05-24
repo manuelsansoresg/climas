@@ -30,8 +30,8 @@
                                 <div class="row g-4">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label class="form-label" for="product_id">Producto</label>
-                                            <select class="form-select js-select2" id="product_id" name="product_id" style="width:100%" required>
+                                            <label class="form-label" for="warehouse_product_id">Producto</label>
+                                            <select class="form-select js-select2" id="warehouse_product_id" name="product_id" style="width:100%" required>
                                                 @if($warehouse->product)
                                                     <option value="{{ $warehouse->product_id }}" selected>
                                                         {{ $warehouse->product->name }}
@@ -138,11 +138,11 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('#product_id').select2({
+    $('#warehouse_product_id').select2({
         placeholder: 'Buscar producto...',
         allowClear: true,
         ajax: {
-            url: '/api/products/search',
+            url: '/api/products/all/search',
             dataType: 'json',
             delay: 250,
             data: function(params) {

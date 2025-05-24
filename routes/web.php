@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductReportController;
+use App\Http\Controllers\SaleReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,7 +65,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Rutas para sucursales
     Route::resource('sucursales', \App\Http\Controllers\Admin\SucursalController::class);
 
-    // Client routes
+    // Client routesal
     Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);
 
     // Sales routes
@@ -77,14 +78,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Reportes personalizados
     Route::get('reports/products', [ProductReportController::class, 'index'])->name('reports.products');
     Route::get('reports/stock',[ProductReportController::class, 'stock'])->name('reports.stock');
-    Route::get('reports/ventas',[ProductReportController::class, 'sales'])->name('reports.sales');
+    Route::get('reports/ventas',[SaleReportController::class, 'index'])->name('reports.sales');
 
     // Warehouse routes
     Route::resource('warehouses', \App\Http\Controllers\Admin\WareHouseController::class);
     Route::post('warehouses/{id}/restore', [\App\Http\Controllers\Admin\WareHouseController::class, 'restore'])->name('warehouses.restore');
+
+    //Route::get('/sale-report', \App\Http\Livewire\Admin\SaleReport::class)->name('sale-report');
 });
 
 // API routes for product search
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/products/search', [App\Http\Controllers\Api\ProductController::class, 'search']);
+    Route::get('/api/products/all/search', [App\Http\Controllers\Api\ProductController::class, 'searchAll']);
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    
 });

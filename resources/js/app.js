@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (role === 'Cliente mayorista') {
             return producto.precio_mayorista;
         } else if (role === 'Cliente instalador') {
-            return producto.precio_distribuidor;
+            return producto.precio_instalador;
         } else {
             return producto.precio_publico;
         }
@@ -600,4 +600,38 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('No se encontró #product_id al inicializar Select2');
         }
     }, 1000);
+
+    // Inicializar Select2 para búsqueda de productos (forzado con setTimeout para asegurar que el select esté en el DOM)
+    setTimeout(function() {
+        if ($('#warehouse_product_id').length) {
+            console.log('Inicializando Select2 para #product_id');
+            $('#warehouse_product_id').select2({
+                placeholder: 'Buscar producto...',
+                allowClear: true,
+                ajax: {
+                    url: '/api/products/all/search',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { q: params.term };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.map(function(item) {
+                                return { id: item.id, text: item.name };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                width: '100%'
+            });
+        } else {
+            console.log('No se encontró #product_id al inicializar Select2');
+        }
+    }, 1000);
+
+
 });
+

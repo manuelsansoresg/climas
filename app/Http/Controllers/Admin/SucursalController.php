@@ -59,12 +59,16 @@ class SucursalController extends Controller
         }
     }
 
-    public function edit(Sucursal $sucursal)
+    public function edit($id)
     {
+        $sucursal = Sucursal::find($id);
+        if ($sucursal == null) {
+            return redirect()->route('admin.sucursales.index')->with('error', 'Sucursal no encontrada');
+        }
         return view('admin.sucursales.edit', compact('sucursal'));
     }
 
-    public function update(Request $request, Sucursal $sucursal)
+    public function update(Request $request, $id)
     {
         try {
             DB::beginTransaction();
@@ -91,7 +95,7 @@ class SucursalController extends Controller
                 'address.max' => 'La dirección no puede tener más de 255 caracteres',
             ]);
 
-            $sucursal->update($validated);
+            Sucursal::where('id', $id)->update($validated);
 
             DB::commit();
             return redirect()->route('admin.sucursales.index')
