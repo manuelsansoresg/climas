@@ -26,7 +26,7 @@
                 <div class="nk-content ">
                     <div class="nk-block nk-block-middle nk-auth-body wide-xs">
                         <div class="brand-logo pb-4 text-center">
-                            <a href="html/index.html" class="logo-link">
+                            <a href="/" class="logo-link">
                                 <img class="logo-light logo-img logo-img-lg" src="{{ asset('images/backti_logo.png') }}"
                                     srcset="{{ asset('images/backti_logo2x.png') }} 2x" alt="logo">
                                 <img class="logo-dark logo-img logo-img-lg"
