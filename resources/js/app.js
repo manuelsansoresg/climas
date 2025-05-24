@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('previewImage').style.display = 'none';
                     document.getElementById('mainImageDeleteBtn').style.display = 'none';
                 } else {
-                    alert('No se pudo eliminar la imagen');
+                    //alert('No se pudo eliminar la imagen');
                 }
             });
         }
