@@ -30,8 +30,18 @@ class HomeController extends Controller
     public function productDetail($slug)
     {
         $product = Product::where('slug', $slug)->first();
-        // Logic to fetch product details using the slug
-        return view('producto', ['product' => $product]);
+        
+        // Obtener 3 productos al azar con stock disponible, excluyendo el producto actual
+        $relatedProductsCollection = Product::all()
+        ->filter(function($p) use ($product) {
+            return $p->getAvailableStockAttribute() > 0 && $p->id != $product->id;
+        });
+
+        $relatedProducts = $relatedProductsCollection->count() > 3 
+            ? $relatedProductsCollection->random(3) 
+            : $relatedProductsCollection;
+
+        return view('producto', ['product' => $product, 'relatedProducts' => $relatedProducts]);
     }
     
     public function home()

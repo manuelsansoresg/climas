@@ -56,54 +56,26 @@
     <div class="mt-5">
         <h4 class="fw-bold mb-4">También te pueden interesar</h4>
         <div class="row g-3">
-            <!-- Producto 1 -->
-            <div class="col-12 col-md-4 col-lg-4">
-                <div class="card h-100 position-relative shadow-sm">
-                    <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span>
-                    <img src="/images/productos/producto1.png" class="card-img-top p-3" style="height:120px;object-fit:contain;" alt="Mabe 12K BTUS 110 V Frio">
-                    <div class="card-body text-center">
-                        <div class="text-muted small mb-1">MABE</div>
-                        <h6 class="card-title mb-2">Aire Acondicionado Mabe 12K BTUS 110 V Frio</h6>
-                        <div class="mb-2">
-                            <span class="fw-bold text-primary fs-4">$ 4,590.00</span>
-                            <span class="text-decoration-line-through text-muted ms-2">$ 6,332.00</span>
+            @foreach ($relatedProducts as $related)
+                <!-- Producto 1 -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <div class="card h-100 position-relative shadow-sm">
+                        {{-- <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span> --}}
+                        <img src="{{ asset($related->image) }}" class="card-img-top p-3" style="height:120px;object-fit:contain;" alt="{{ $related->name }}">
+
+
+                        <div class="card-body text-center">
+                            <div class="text-muted small mb-1"> {{ $related->name }} </div>
+                            <h6 class="card-title mb-2">{{ $related->description }}</h6>
+                            <div class="mb-2">
+                                <span class="fw-bold text-primary fs-4">${{ number_format($related->precio_publico, 2) }}</span>
+                                {{-- <span class="text-decoration-line-through text-muted ms-2">$ 6,332.00</span> --}}
+                            </div>
+                            <a href="#" class="btn btn-primary w-100">Ver Detalles</a>
                         </div>
-                        <a href="#" class="btn btn-primary w-100">Ver Detalles</a>
                     </div>
                 </div>
-            </div>
-            <!-- Producto 2 -->
-            <div class="col-12 col-md-4 col-lg-4">
-                <div class="card h-100 position-relative shadow-sm">
-                    <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span>
-                    <img src="/images/productos/producto2.png" class="card-img-top p-3" style="height:120px;object-fit:contain;" alt="LG 12K BTUS 110V">
-                    <div class="card-body text-center">
-                        <div class="text-muted small mb-1">LG</div>
-                        <h6 class="card-title mb-2">Aire Acondicionado LG 12K BTUS 110V</h6>
-                        <div class="mb-2">
-                            <span class="fw-bold text-primary fs-4">$ 4,890.00</span>
-                            <span class="text-decoration-line-through text-muted ms-2">$ 7,412.00</span>
-                        </div>
-                        <a href="#" class="btn btn-primary w-100">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Producto 3 -->
-            <div class="col-12 col-md-4 col-lg-4">
-                <div class="card h-100 position-relative shadow-sm">
-                    <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span>
-                    <img src="/images/productos/producto1.png" class="card-img-top p-3" style="height:120px;object-fit:contain;" alt="Daewoo 12K BTUS 110V">
-                    <div class="card-body text-center">
-                        <div class="text-muted small mb-1">DAEWOO</div>
-                        <h6 class="card-title mb-2">Aire Acondicionado Daewoo 12K BTUS 110V</h6>
-                        <div class="mb-2">
-                            <span class="fw-bold text-primary fs-4">$ 5,085.00</span>
-                            <span class="text-decoration-line-through text-muted ms-2">$ 6,365.00</span>
-                        </div>
-                        <a href="#" class="btn btn-primary w-100">Ver Detalles</a>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
