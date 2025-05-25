@@ -183,52 +183,44 @@
                                     
                                     
                                     <li class="dropdown user-dropdown">
-                                        <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown">
+                                        <a href="#" class="dropdown-toggle me-n1" data-bs-toggle="dropdown" aria-expanded="false">
                                             <div class="user-toggle">
                                                 <div class="user-avatar sm">
                                                     <em class="icon ni ni-user-alt"></em>
                                                 </div>
                                                 <div class="user-info d-none d-xl-block">
-                                                    @if (Route::has('login'))
-                                                        @auth
-                                                            <div class="user-name dropdown-indicator">
-                                                                {{ Auth::user()->name }}
-                                                            </div>
-                                                        @endauth
-                                                    @endif
+                                                    <div class="user-name dropdown-indicator">{{ Auth::user()->name }}</div>
                                                 </div>
                                             </div>
                                         </a>
-                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end">
+                                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end" data-bs-popper="none">
                                             <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                                                 <div class="user-card">
-                                                    
+                                                    <div class="user-avatar">
+                                                        <span>AB</span>
+                                                    </div>
                                                     <div class="user-info">
-                                                        @if (Route::has('login'))
-                                                            <span class="lead-text"> {{ Auth::user()->name }}</span>
-                                                            <span class="sub-text"> {{ Auth::user()->email }}</span>
-                                                        
-                                                        @endif
+                                                        <span class="lead-text">{{ Auth::user()->name }}</span>
+                                                        <span class="sub-text">{{ Auth::user()->email }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="dropdown-inner">
                                                 <ul class="link-list">
-                                                    <li><a href="html/user-profile-regular.html"><em class="icon ni ni-user-alt"></em><span>Ver Perfil</span></a></li>
-                                                    <li><a class="dark-switch" href="#"><em class="icon ni ni-moon"></em><span>Modo oscuro</span></a></li>
+                                                    <li><a href="html/user-profile-setting.html"><em class="icon ni ni-setting-alt"></em><span>Account Setting</span></a></li>
+                                                    <li><a href="html/user-profile-activity.html"><em class="icon ni ni-activity-alt"></em><span>Login Activity</span></a></li>
+                                                    <li><a class="dark-switch" href="#"><em class="icon ni ni-moon"></em><span>Dark Mode</span></a></li>
                                                 </ul>
                                             </div>
                                             <div class="dropdown-inner">
                                                 <ul class="link-list">
-                                                    
                                                     <li>
-                                                        <a href="#"
-                                                            onclick="event.preventDefault();
-                                                        document.getElementById('logout-form').submit();"><em
-                                                                class="icon ni ni-signout"></em><span>Cerrar sesión</span></a>
-                                                        <form id="logout-form" action="{{ route('logout') }}"
-                                                            method="POST" class="d-none">
+                                                        <form method="POST" action="{{ route('logout') }}">
                                                             @csrf
+                                                            <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                                                <em class="icon ni ni-signout"></em>
+                                                                <span>Salir</span>
+                                                            </a>
                                                         </form>
                                                     </li>
                                                 </ul>
@@ -900,12 +892,25 @@
         </div><!-- .modla-dialog -->
     </div><!-- .modal -->
     <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
     <script src="/assets/js/bundle.js?ver=3.2.4"></script>
     <script src="/assets/js/scripts.js?ver=3.2.4"></script>
     <script src="/assets/js/charts/chart-ecommerce.js?ver=3.2.4"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/app.js?v=1.0.0') }}"></script>
     @livewireScripts
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar todos los dropdowns de Bootstrap
+            var dropdownElementList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
+       
+    </script>
 </body>
 
 </html>
