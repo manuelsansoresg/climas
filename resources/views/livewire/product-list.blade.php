@@ -2,12 +2,14 @@
     <!-- Barra de búsqueda y ordenamiento -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <div class="input-group">
-                <input type="text" class="form-control"  wire:model.debounce.300ms="search" placeholder="Buscar productos..." aria-label="Buscar productos">
-                <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+            <form wire:submit.prevent="applySearch" class="w-100">
+                <div class="input-group">
+                    <input type="text" class="form-control" wire:model.defer="search" placeholder="Buscar productos..." aria-label="Buscar productos">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
         </div>
         <div class="col-md-4">
             <select class="form-select" wire:model="orderBy">
@@ -52,8 +54,8 @@
                                         <div class="subcategories-list ms-4 mt-2">
                                             @foreach($category->subcategories as $subcategory)
                                                 <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="checkbox" wire:model="selectedCategories" value="{{ $subcategory->id }}" id="cat{{ $subcategory->id }}">
-                                                    <label class="form-check-label cursor-pointer" for="cat{{ $subcategory->id }}">
+                                                    <input class="form-check-input" type="checkbox" wire:model="selectedSubcategories" value="{{ $subcategory->id }}" id="subcat{{ $subcategory->id }}">
+                                                    <label class="form-check-label cursor-pointer" for="subcat{{ $subcategory->id }}">
                                                         {{ $subcategory->name }}
                                                     </label>
                                                 </div>
@@ -94,7 +96,7 @@
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="fw-bold" style="color:#003366;">Productos</h3>
-                <span class="text-muted">12 productos encontrados</span>
+                <span class="text-muted">{{ $products->total() }} productos encontrados</span>
             </div>
             
             <div class="row g-4">
@@ -114,12 +116,19 @@
                                 <span class="fw-bold fs-5 text-primary">${{ number_format($product->precio_publico, 2) }}</span>
                                 {{-- <span class="text-decoration-line-through text-muted ms-2">$ 6,332.00</span> --}}
                             </div>
+                            <div class="mb-2">
+                                <span class="badge bg-success">Stock disponible: {{ $product->getAvailableStockAttribute() }}</span>
+                            </div>
                             <a href="/productos/prueba" class="btn btn-primary w-100">Ver Detalles</a>
                         </div>
                     </div>
                 </div>
                 @endforeach
                 
+                <!-- Paginación -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
     </div>

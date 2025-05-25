@@ -74,4 +74,20 @@ class Product extends Model
     {
         return $this->hasMany(SaleDetail::class);
     }
+    
+    /**
+     * Calcula el stock disponible del producto considerando las ventas
+     * @return int
+     */
+    public function getAvailableStockAttribute()
+    {
+        // Suma total de stock en almacén
+        $totalStock = $this->warehouses()->sum('cantidad');
+        
+        // Suma total de productos vendidos
+        $totalSold = $this->saleDetails()->sum('quantity');
+        
+        // Stock disponible = total en almacén - total vendido
+        return max(0, $totalStock - $totalSold);
+    }
 }

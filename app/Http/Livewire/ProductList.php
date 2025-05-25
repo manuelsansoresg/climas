@@ -27,19 +27,15 @@ class ProductList extends Component
         'orderBy' => ['except' => 'name_asc'],
         'minPrice' => ['except' => ''],
         'maxPrice' => ['except' => ''],
+        'page' => ['except' => 1],
     ];
 
-    public function mount()
-    {
-        $this->resetFilters();
-    }
-
-    public function resetFilters()
-    {
-        $this->reset(['selectedCategories', 'selectedSubcategories', 'selectedSubcategories2', 'selectedSubcategories3', 'minPrice', 'maxPrice']);
-    }
-
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function applySearch()
     {
         $this->resetPage();
     }
@@ -66,40 +62,42 @@ class ProductList extends Component
 
     public function render()
     {
-        $query = Product::query();
+        $query = Product::with(['category', 'warehouses', 'saleDetails']);
 
-        if (!empty($this->search)) {
-            $query->where(function($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
-            });
+        // Filtro por nombre
+        if (!empty(trim($this->search))) {
+            $searchTerm = trim($this->search);
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
         }
 
+        // Filtros de categorías
         if (!empty($this->selectedCategories)) {
             $query->whereIn('category_id', $this->selectedCategories);
         }
-
         if (!empty($this->selectedSubcategories)) {
             $query->whereIn('subcategory_id', $this->selectedSubcategories);
         }
-
         if (!empty($this->selectedSubcategories2)) {
             $query->whereIn('subcategory2_id', $this->selectedSubcategories2);
         }
-
         if (!empty($this->selectedSubcategories3)) {
             $query->whereIn('subcategory3_id', $this->selectedSubcategories3);
         }
 
+        // Filtros de precio
         if (!empty($this->minPrice)) {
             $query->where('precio_publico', '>=', $this->minPrice);
         }
-
         if (!empty($this->maxPrice)) {
             $query->where('precio_publico', '<=', $this->maxPrice);
         }
 
-        // Aplicar ordenamiento
+        // Filtro de stock disponible
+        $query->whereHas('warehouses', function($q) {
+            $q->where('stock', '>', 0);
+        });
+
+        // Ordenamiento
         switch($this->orderBy) {
             case 'price_asc':
                 $query->orderBy('precio_publico', 'asc');
@@ -116,8 +114,11 @@ class ProductList extends Component
                 break;
         }
 
+        $perPage = 12;
+        $products = $query->paginate($perPage);
+
         return view('livewire.product-list', [
-            'products' => $query->paginate(12),
+            'products' => $products,
             'categories' => Category::with(['subcategories.subcategories2.subcategories3'])->get()
         ]);
     }
