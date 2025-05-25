@@ -22,7 +22,7 @@
     </div>
 
     <!-- Filtros activos -->
-    <div class="row mb-4">
+    {{-- <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex flex-wrap gap-2">
                 <span class="badge bg-primary p-2">Aires Acondicionados <i class="fas fa-times ms-1"></i></span>
@@ -30,7 +30,7 @@
                 <span class="badge bg-primary p-2">LG <i class="fas fa-times ms-1"></i></span>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="row">
         <!-- Sidebar de filtros -->
