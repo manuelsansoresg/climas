@@ -96,6 +96,7 @@ class ProductController extends Controller
             // Crear el producto
             $product = new Product();
             $product->name = $request->name;
+            $product->slug = \Str::slug($request->name);
             $product->description = $request->description;
             $product->category_id = $request->category_id;
             $product->subcategory_id = $request->subcategory_id;
@@ -218,6 +219,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $product->name = $request->name;
+            $product->slug = \Str::slug($request->name);
             $product->description = $request->description;
             $product->category_id = $request->category_id;
             $product->subcategory_id = $request->subcategory_id;

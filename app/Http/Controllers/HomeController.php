@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -24,6 +25,13 @@ class HomeController extends Controller
     public function index()
     {
         return view('index');
+    }
+
+    public function productDetail($slug)
+    {
+        $product = Product::where('slug', $slug)->first();
+        // Logic to fetch product details using the slug
+        return view('producto', ['product' => $product]);
     }
     
     public function home()

@@ -103,7 +103,7 @@ class ProductList extends Component
                 $query->orderBy('precio_publico', 'asc');
                 break;
             case 'price_desc':
-                $query->orderBy('precio_publico', 'desc');
+                $query->orderBy('precio_publico', 'desc'); 
                 break;
             case 'name_desc':
                 $query->orderBy('name', 'desc');

@@ -119,7 +119,7 @@
                             <div class="mb-2">
                                 <span class="badge bg-success">Stock disponible: {{ $product->getAvailableStockAttribute() }}</span>
                             </div>
-                            <a href="/productos/prueba" class="btn btn-primary w-100">Ver Detalles</a>
+                            <a href="/productos/{{ Str::slug($product->name) }}" class="btn btn-primary w-100">Ver Detalles</a>
                         </div>
                     </div>
                 </div>

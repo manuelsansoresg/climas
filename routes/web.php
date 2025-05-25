@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductReportController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SaleReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -22,9 +23,6 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'home'])->name('home');
 
-Route::get('productos/{name}', function ($name) {
-    return view('producto', ['name' => $name]);
-});
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Category routes
@@ -96,3 +94,5 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     
 });
+
+Route::get('/productos/{slug}', [HomeController::class, 'productDetail']);
