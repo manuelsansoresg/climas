@@ -11,10 +11,10 @@ use Spatie\Permission\Models\Role;
 class ClientController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
     public function index()
     {
         $clients = User::role(['Cliente mayorista', 'Cliente publico en general', 'Cliente instalador'])->get();
@@ -22,35 +22,50 @@ class ClientController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    * Show the form for creating a new resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
     public function create()
     {
         return view('admin.clients.create');
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    * Store a newly created resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'nullable|string|email|max:255|unique:users',
             'phone' => 'required|string|max:20',
-            'rfc' => 'required|string|max:13',
-            'address' => 'required|string',
-            'cp' => 'string|max:5',
+            'rfc' => 'nullable|string|max:13',
+            'address' => 'nullable|string',
+            'cp' => 'nullable|string|max:5',
             'client_type' => 'required_if:is_admin,true|string|in:Cliente mayorista,Cliente publico en general,Cliente instalador',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $user = User::create($validated);
+        $userData = [
+            'name' => $validated['name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'],
+            'rfc' => $validated['rfc'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'cp' => $validated['cp'] ?? null,
+        ];
+
+        if (!empty($validated['password'])) {
+            $userData['password'] = Hash::make($validated['password']);
+        }
+
+        $user = User::create($userData);
         
         // Asignar el rol según el tipo de cliente
         if ($request->user()->roles()->where('name', 'Admin')->exists() && isset($validated['client_type'])) {
@@ -67,34 +82,34 @@ class ClientController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Display the specified resource.
+    *
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function show($id)
     {
         //
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Show the form for editing the specified resource.
+    *
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function edit(User $client)
     {
         return view('admin.clients.edit', compact('client'));
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Update the specified resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function update(Request $request, User $client)
     {
         $validated = $request->validate([
@@ -102,13 +117,28 @@ class ClientController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $client->id,
             'phone' => 'required|string|max:20',
-            'rfc' => 'required|string|max:13',
-            'address' => 'required|string',
-            'cp' => 'string|max:5',
+            'rfc' => 'nullable|string|max:13',
+            'address' => 'nullable|string',
+            'cp' => 'nullable|string|max:5',
             'client_type' => 'required_if:is_admin,true|string|in:Cliente mayorista,Cliente publico en general,Cliente instalador',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $client->update($validated);
+        $updateData = [
+            'name' => $validated['name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'rfc' => $validated['rfc'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'cp' => $validated['cp'] ?? null,
+        ];
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $client->update($updateData);
 
         // Actualizar el rol si el usuario es admin
         if ($request->user()->roles()->where('name', 'Admin')->exists() && isset($validated['client_type'])) {
@@ -125,11 +155,11 @@ class ClientController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    * Remove the specified resource from storage.
+    *
+    * @param  int  $id
+    * @return \Illuminate\Http\Response
+    */
     public function destroy(User $client)
     {
         // Remover el rol de Cliente antes de eliminar
@@ -140,16 +170,16 @@ class ClientController extends Controller
     }
 
     /**
-     * Búsqueda AJAX para Select2 en ventas
-     */
+    * Búsqueda AJAX para Select2 en ventas
+    */
     public function search(Request $request)
     {
         $q = $request->get('q');
         $clients = User::role(['Cliente mayorista', 'Cliente publico en general', 'Cliente instalador'])
             ->where(function($query) use ($q) {
                 $query->where('name', 'like', "%$q%")
-                      ->orWhere('email', 'like', "%$q%")
-                      ->orWhere('rfc', 'like', "%$q%") ;
+                    ->orWhere('email', 'like', "%$q%")
+                    ->orWhere('rfc', 'like', "%$q%") ;
             })
             ->take(10)
             ->get(['id', 'name', 'last_name', 'email', 'rfc']);

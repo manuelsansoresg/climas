@@ -28,7 +28,7 @@
                                 @csrf
                                 @method('PUT')
                                 <div class="form-group">
-                                    <label for="name">Nombre</label>
+                                    <label for="name">*Nombre</label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $client->name) }}" required>
                                     @error('name')
                                         <span class="invalid-feedback">{{ $message }}</span>
@@ -36,7 +36,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="last_name">Apellido</label>
+                                    <label for="last_name">*Apellido</label>
                                     <input type="text" class="form-control @error('last_name') is-invalid @enderror" id="last_name" name="last_name" value="{{ old('last_name', $client->last_name) }}" required>
                                     @error('last_name')
                                         <span class="invalid-feedback">{{ $message }}</span>
@@ -45,14 +45,27 @@
 
                                 <div class="form-group">
                                     <label for="email">Correo Electrónico</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $client->email) }}" required>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $client->email) }}">
                                     @error('email')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="phone">Teléfono</label>
+                                    <label for="password">Contraseña (opcional)</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+                                    @error('password')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="password_confirmation">Confirmar Contraseña</label>
+                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="phone">*Teléfono</label>
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $client->phone) }}" required>
                                     @error('phone')
                                         <span class="invalid-feedback">{{ $message }}</span>
@@ -69,7 +82,7 @@
 
                                 <div class="form-group">
                                     <label for="rfc">RFC</label>
-                                    <input type="text" class="form-control @error('rfc') is-invalid @enderror" id="rfc" name="rfc" value="{{ old('rfc', $client->rfc) }}" required>
+                                    <input type="text" class="form-control @error('rfc') is-invalid @enderror" id="rfc" name="rfc" value="{{ old('rfc', $client->rfc) }}" >
                                     @error('rfc')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -77,7 +90,7 @@
 
                                 <div class="form-group">
                                     <label for="address">Dirección</label>
-                                    <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3" required>{{ old('address', $client->address) }}</textarea>
+                                    <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3" >{{ old('address', $client->address) }}</textarea>
                                     @error('address')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
