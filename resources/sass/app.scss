@@ -100,3 +100,11 @@ body {
 .nested-category {
   margin-left: 1.5rem;
 }
+
+.uniform-icon-size {
+  font-size: 1.2rem; /* Ajusta el tamaño que quieras */
+  width: 1.5em;      /* Opcional: para que tengan ancho igual */
+  height: 1.5em;     /* Opcional */
+  display: inline-block;
+  text-align: center;
+}

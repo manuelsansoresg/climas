@@ -1,4 +1,5 @@
 require('./bootstrap');
+require('./components/warehouse');
 
 document.addEventListener('DOMContentLoaded', function () {
     

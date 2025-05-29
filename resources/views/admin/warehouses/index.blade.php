@@ -57,16 +57,17 @@
                                         <td>{{ $warehouse->fechaingresa }}</td>
                                         <td>
                                           
-                                            <a href="{{ route('admin.warehouses.edit', $warehouse) }}" class="btn btn-info btn-sm">
-                                                <em class="icon ni ni-edit"></em>
+                                            <a href="{{ route('admin.warehouses.edit', $warehouse) }}" class="btn btn-info uniform-icon-size">
+                                                <i class="fas fa-edit"></i>
+
                                             </a>
                                             @if($warehouse->trashed())
-                                            <a href="#" onclick="restoreWarehouse({{ $warehouse->id }})" class="btn btn-success btn-sm">
-                                                <em class="icon ni ni-refresh"></em>
+                                            <a href="#" onclick="restoreWarehouse({{ $warehouse->id }})" class="btn btn-success uniform-icon-size">
+                                                <i class="fas fa-sync-alt"></i>
                                             </a>
                                             @else
-                                                <a href="#" onclick="deleteWarehouse({{ $warehouse->id }})" class="btn btn-danger btn-sm">
-                                                    <em class="icon ni ni-trash"></em>
+                                                <a href="#" onclick="deleteWarehouse({{ $warehouse->id }})" class="btn btn-danger uniform-icon-size">
+                                                    <i class="fas fa-trash"></i>
                                                 </a>
                                             @endif
                                         </td>
@@ -82,75 +83,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function deleteWarehouse(id) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "Esta acción no se puede revertir",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/admin/warehouses/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire(
-                        '¡Eliminado!',
-                        'El registro ha sido eliminado.',
-                        'success'
-                    ).then(() => {
-                        window.location.reload();
-                    });
-                }
-            });
-        }
-    });
-}
-
-function restoreWarehouse(id) {
-    Swal.fire({
-        title: '¿Restaurar registro?',
-        text: "¿Deseas restaurar este registro?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, restaurar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/admin/warehouses/${id}/restore`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire(
-                        '¡Restaurado!',
-                        'El registro ha sido restaurado.',
-                        'success'
-                    ).then(() => {
-                        window.location.reload();
-                    });
-                }
-            });
-        }
-    });
-}
-</script>
-@endpush 

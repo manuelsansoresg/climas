@@ -13,7 +13,8 @@ class WareHouseController extends Controller
 {
     public function index()
     {
-        $warehouses = WareHouse::with(['product', 'user', 'provider'])
+        $warehouses = WareHouse::withTrashed()
+            ->with(['product', 'user', 'provider'])
             ->orderBy('created_at', 'desc')
             ->get();
         return view('admin.warehouses.index', compact('warehouses'));
