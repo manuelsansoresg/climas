@@ -11,6 +11,10 @@ class ProductSale extends Model
 
     protected $fillable = ['product_id', 'warehouse_id', 'quantity', 'sale_price', 'sale_date'];
 
+    protected $casts = [
+        'sale_date' => 'datetime',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);

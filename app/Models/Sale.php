@@ -17,6 +17,7 @@ class Sale extends Model
         'iva',
         'status',
         'folio',
+        'warehouse_id',
         'payment_method',
         'payment_status',
         'notes',

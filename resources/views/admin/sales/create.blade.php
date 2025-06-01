@@ -59,6 +59,18 @@
                                             </select>
                                         </div>
                                     </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="payment_method">*Almacén</label>
+                                            <select class="form-control @error('warehouse_id') is-invalid @enderror" id="warehouse_id" name="warehouse_id" required>
+                                                <option value="">Seleccione un almacén</option>
+                                                @foreach($warehouses as $warehouse)
+                                                  <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row g-4 mt-2">
                                     <div class="col-12">

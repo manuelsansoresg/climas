@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Sale;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\ProductSale;
 use App\Models\SaleDetail;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,8 +22,9 @@ class SaleController extends Controller
 
     public function create()
     {
+        $warehouses = Warehouse::all();
         $clients = User::role(['Cliente publico en general', 'Cliente mayorista', 'Cliente instalador'])->get();
-        return view('admin.sales.create', compact('clients'));
+        return view('admin.sales.create', compact('clients', 'warehouses'));
     }
 
     public function store(Request $request)
@@ -42,18 +45,29 @@ class SaleController extends Controller
             $iva = 0;
             $total = 0;
             
-            // Calculate totals
+            // Agrupar cantidades por producto
+            $productQuantities = [];
             foreach ($request->products as $item) {
-                $product = Product::findOrFail($item['product_id']);
-                
-                // Verificar stock
-                if ($product->stock < $item['quantity']) {
+                if (!isset($productQuantities[$item['product_id']])) {
+                    $productQuantities[$item['product_id']] = 0;
+                }
+                $productQuantities[$item['product_id']] += $item['quantity'];
+            }
+
+            // Validar stock por producto
+            foreach ($productQuantities as $productId => $totalQuantity) {
+                $product = Product::findOrFail($productId);
+                if ($product->stock() < $totalQuantity) {
                     throw new \Exception("Stock insuficiente para el producto: {$product->name}");
                 }
+            }
+
+            // Calcular totales
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['product_id']);
                 $price = $this->getPriceByUserRole($product, $request->client_id);
                 $itemSubtotal = $price * $item['quantity'];
                 $itemIva = $itemSubtotal * ($product->iva / 100);
-                
                 $subtotal += $itemSubtotal;
                 $iva += $itemIva;
             }
@@ -91,8 +105,20 @@ class SaleController extends Controller
 
                 // Update product stock
                 $product->decrement('stock', $item['quantity']);
-            }
 
+                if ($request->status == 2) { //pagado
+                    // Crear salida en inventario
+                    ProductSale::create([
+                        'product_id' => $item['product_id'],
+                        'warehouse_id' => $request->warehouse_id, // si usas almacenes
+                        'quantity' => $item['quantity'],
+                        'sale_price' => $price,
+                        'sale_date' => now(),
+                    ]);
+                }
+
+            }
+           
             DB::commit();
             
             return response()->json([
