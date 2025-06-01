@@ -16,9 +16,10 @@ class Sale extends Model
         'subtotal',
         'iva',
         'status',
+        'folio',
         'payment_method',
         'payment_status',
-        'notes'
+        'notes',
     ];
 
     public function user()

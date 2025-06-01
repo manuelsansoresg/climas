@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Warehouse;
+use App\Models\IvaRate;
 use Illuminate\Http\Request;
 
-class WarehouseController extends Controller
+class IvaRateController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -42,10 +42,10 @@ class WarehouseController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Warehouse  $warehouse
+     * @param  \App\Models\IvaRate  $ivaRate
      * @return \Illuminate\Http\Response
      */
-    public function show(Warehouse $warehouse)
+    public function show(IvaRate $ivaRate)
     {
         //
     }
@@ -53,10 +53,10 @@ class WarehouseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Warehouse  $warehouse
+     * @param  \App\Models\IvaRate  $ivaRate
      * @return \Illuminate\Http\Response
      */
-    public function edit(Warehouse $warehouse)
+    public function edit(IvaRate $ivaRate)
     {
         //
     }
@@ -65,10 +65,10 @@ class WarehouseController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Warehouse  $warehouse
+     * @param  \App\Models\IvaRate  $ivaRate
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Warehouse $warehouse)
+    public function update(Request $request, IvaRate $ivaRate)
     {
         //
     }
@@ -76,10 +76,10 @@ class WarehouseController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Warehouse  $warehouse
+     * @param  \App\Models\IvaRate  $ivaRate
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Warehouse $warehouse)
+    public function destroy(IvaRate $ivaRate)
     {
         //
     }

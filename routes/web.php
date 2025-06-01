@@ -79,10 +79,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('reports/ventas',[SaleReportController::class, 'index'])->name('reports.sales');
 
     // Warehouse routes
-    Route::resource('warehouses', \App\Http\Controllers\Admin\WareHouseController::class);
-    Route::post('warehouses/{id}/restore', [\App\Http\Controllers\Admin\WareHouseController::class, 'restore'])->name('warehouses.restore');
 
     //Route::get('/sale-report', \App\Http\Livewire\Admin\SaleReport::class)->name('sale-report');
+
+    Route::resource('product-entries', \App\Http\Controllers\Admin\ProductEntryController::class);
+    Route::resource('product-sales', \App\Http\Controllers\Admin\ProductSaleController::class);
 });
 
 // API routes for product search

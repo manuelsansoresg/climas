@@ -150,7 +150,7 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                   {{--  <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="stock">Stock <span class="text-danger">*</span></label>
                                             <input type="number" class="form-control @error('stock') is-invalid @enderror" id="stock" name="stock" value="{{ old('stock', $product->stock) }}" required min="0">
@@ -158,7 +158,7 @@
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="iva">IVA (%) <span class="text-danger">*</span></label>
@@ -250,12 +250,12 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="status">Estado</label>
-                                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
-                                                <option value="1" {{ old('status', $product->status) == 1 ? 'selected' : '' }}>Activo</option>
-                                                <option value="0" {{ old('status', $product->status) == 0 ? 'selected' : '' }}>Inactivo</option>
+                                            <label for="active">Estado</label>
+                                            <select class="form-control @error('active') is-invalid @enderror" id="active" name="active">
+                                                <option value="1" {{ old('active', $product->active) == 1 ? 'selected' : '' }}>Activo</option>
+                                                <option value="0" {{ old('active', $product->active) == 0 ? 'selected' : '' }}>Inactivo</option>
                                             </select>
-                                            @error('status')
+                                            @error('active')
                                                 <span class="invalid-feedback">{{ $message }}</span>
                                             @enderror
                                         </div>

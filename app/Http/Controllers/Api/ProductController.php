@@ -49,25 +49,9 @@ class ProductController extends Controller
             $q->where('name', 'like', "%{$query}%")
               ->orWhere('description', 'like', "%{$query}%");
         })
-        ->where('status', true)
+        ->where('active', true)
         ->take(10)
-        ->get()
-        ->map(function ($product) {
-            $warehouseQuantity = $product->warehouses()
-                ->whereNull('deleted_at')
-                ->sum('cantidad');
-            $salesQuantity = $product->saleDetails()->sum('quantity');
-            $availableStock = $warehouseQuantity - $salesQuantity;
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'precio_publico' => $product->precio_publico,
-                'precio_mayorista' => $product->precio_mayorista,
-                'precio_distribuidor' => $product->precio_distribuidor,
-                'iva' => $product->iva,
-                'stock' => $availableStock
-            ];
-        });
+        ->get();
 
         return response()->json($products);
         

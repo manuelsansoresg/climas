@@ -53,7 +53,13 @@
                                     </a>
                                 </li><!-- .nk-menu-item -->
                                 <li class="nk-menu-item">
-                                    <a href="#" class="nk-menu-link">
+                                    <a href="{{ route('admin.product-entries.index') }}" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-activity-round-fill"></em></span>
+                                        <span class="nk-menu-text">Entradas</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
+                                <li class="nk-menu-item">
+                                    <a href="{{ route('admin.product-sales.index') }}" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-activity-round-fill"></em></span>
                                         <span class="nk-menu-text">Salidas</span>
                                     </a>

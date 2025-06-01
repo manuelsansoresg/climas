@@ -41,6 +41,16 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="payment_method">Estatus</label>
+                                    <select name="status" id="status" class="form-control" required>
+                                        @foreach(config('enums.sale_status') as $key => $value)
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach 
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row mb-4">

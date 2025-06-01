@@ -47,12 +47,12 @@ class ProductController extends Controller
                 'precio_distribuidor' => 'nullable|numeric|min:0',
                 'precio_publico' => 'required|numeric|min:0',
                 'precio_instalador' => 'nullable|numeric|min:0',
-                'stock' => 'required|integer|min:0',
+                //'stock' => 'null|integer|min:0',
                 'iva' => 'required|numeric|min:0|max:100',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'pdf' => 'nullable|mimes:pdf|max:10240',
-                'status' => 'required|boolean',
+                'active' => 'required|boolean',
                 'sucursales' => 'required|array',
                 'sucursales.*' => 'exists:sucursales,id'
             ], [
@@ -72,9 +72,8 @@ class ProductController extends Controller
                 'precio_publico.min' => 'El precio público no puede ser negativo',
                 'precio_instalador.numeric' => 'El precio instalador debe ser un número',
                 'precio_instalador.min' => 'El precio instalador no puede ser negativo',
-                'stock.required' => 'El stock es obligatorio',
-                'stock.integer' => 'El stock debe ser un número entero',
-                'stock.min' => 'El stock no puede ser negativo',
+                //'stock.integer' => 'El stock debe ser un número entero',
+                //'stock.min' => 'El stock no puede ser negativo',
                 'iva.required' => 'El IVA es obligatorio',
                 'iva.numeric' => 'El IVA debe ser un número',
                 'iva.min' => 'El IVA no puede ser negativo',
@@ -88,7 +87,7 @@ class ProductController extends Controller
                 'images.*.max' => 'Las imágenes adicionales no pueden pesar más de 2MB',
                 'pdf.mimes' => 'El archivo PDF debe ser de tipo PDF',
                 'pdf.max' => 'El archivo PDF no puede pesar más de 10MB',
-                'status.required' => 'Debe seleccionar un estado',
+                'active.required' => 'Debe seleccionar un estado',
                 'sucursales.required' => 'Debe seleccionar al menos una sucursal',
                 'sucursales.*.exists' => 'Una de las sucursales seleccionadas no es válida'
             ]);
@@ -106,9 +105,9 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->precio_instalador = $request->precio_instalador;
-            $product->stock = $request->stock;
+            //$product->stock = $request->stock;
             $product->iva = $request->iva;
-            $product->status = $request->status;
+            $product->active = $request->active;
 
             // Guardar imagen principal
             if ($request->hasFile('image')) {
@@ -205,12 +204,12 @@ class ProductController extends Controller
             'precio_distribuidor' => 'nullable|numeric|min:0',
             'precio_publico' => 'required|numeric|min:0',
             'precio_instalador' => 'nullable|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            //'stock' => 'null|integer|min:0',
             'iva' => 'required|numeric|min:0|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pdf' => 'nullable|mimes:pdf|max:10240',
-            'status' => 'required|boolean',
+            'active' => 'required|boolean',
             'sucursales' => 'required|array',
             'sucursales.*' => 'exists:sucursales,id'
         ]);
@@ -229,9 +228,9 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->precio_instalador = $request->precio_instalador;
-            $product->stock = $request->stock;
+            //$product->stock = $request->stock;
             $product->iva = $request->iva;
-            $product->status = $request->status;
+            $product->active = $request->active;
 
             // Actualizar imagen principal si se proporciona una nueva
             if ($request->hasFile('image')) {

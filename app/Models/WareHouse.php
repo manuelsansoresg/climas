@@ -4,53 +4,45 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class WareHouse extends Model
+class Warehouse extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    protected $fillable = ['name', 'location'];
 
-    protected $table = 'warehouses';
-
-    protected $fillable = [
-        'product_id',
-        'factura',
-        'idusuarioagrega',
-        'fechaingresa',
-        'serie',
-        'costo_compra',
-        'idmov',
-        'campo1',
-        'campo2',
-        'campo3',
-        'campo4',
-        'campo5',
-        'cantidad',
-        'provedor_id',
-    ];
-
-    /**
-     * Get the product that owns the warehouse record.
-     */
-    public function product(): BelongsTo
+    public function productEntries()
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(ProductEntry::class);
     }
 
-    /**
-     * Get the user that added the warehouse record.
-     */
-    public function user(): BelongsTo
+    public function productSales()
     {
-        return $this->belongsTo(User::class, 'idusuarioagrega');
+        return $this->hasMany(ProductSale::class);
     }
 
-    /**
-     * Get the provider user.
-     */
-    public function provider(): BelongsTo
+    public function entries()
     {
-        return $this->belongsTo(User::class, 'provedor_id');
+        return $this->hasMany(ProductEntry::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(ProductSale::class);
+    }
+
+    // Stock total en todos los almacenes
+    public function totalStock()
+    {
+        $entries = $this->entries()->sum('quantity');
+        $sales = $this->sales()->sum('quantity');
+        return $entries - $sales;
+    }
+
+    // Stock por almacén
+    public function stockByWarehouse($warehouseId)
+    {
+        $entries = $this->entries()->where('warehouse_id', $warehouseId)->sum('quantity');
+        $sales = $this->sales()->where('warehouse_id', $warehouseId)->sum('quantity');
+        return $entries - $sales;
     }
 }
