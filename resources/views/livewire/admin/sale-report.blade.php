@@ -35,64 +35,30 @@
                                 </div>
                             </form>
                             <div class="table-responsive position-relative">
-                                @forelse($report as $venta)
-                                    <div class="mb-4">
-                                        <table class="table table-bordered table-striped mb-1">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>ID Venta</th>
-                                                    <th>Fecha</th>
-                                                    <th>Vendedor</th>
-                                                    <th>Cliente</th>
-                                                    <th>Monto Venta</th>
-                                                    <th>Costo Real Total</th>
-                                                    <th>Ganancia Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{{ $venta['id'] }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($venta['fecha'])->format('d/m/Y H:i') }}</td>
-                                                    <td>{{ $venta['vendedor'] }}</td>
-                                                    <td>{{ $venta['cliente'] }}</td>
-                                                    <td>${{ number_format($venta['total_venta'], 2) }}</td>
-                                                    <td>${{ number_format($venta['costo_real_total'], 2) }}</td>
-                                                    <td>${{ number_format($venta['ganancia_total'], 2) }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div class="ms-2 me-2 mb-4">
-                                            <table class="table table-sm table-bordered table-hover">
-                                                <thead class="table-secondary">
-                                                    <tr>
-                                                        <th>Producto</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Precio Venta Unitario</th>
-                                                        <th>Subtotal Venta</th>
-                                                        <th>Costo Real Unitario</th>
-                                                        <th>Costo Real Total</th>
-                                                        <th>Ganancia</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($venta['detalles'] as $detalle)
-                                                        <tr>
-                                                            <td>{{ $detalle['producto'] }}</td>
-                                                            <td>{{ $detalle['cantidad'] }}</td>
-                                                            <td>${{ number_format($detalle['precio_venta_unitario'], 2) }}</td>
-                                                            <td>${{ number_format($detalle['subtotal_venta'], 2) }}</td>
-                                                            <td>${{ number_format($detalle['costo_real_unitario'], 2) }}</td>
-                                                            <td>${{ number_format($detalle['costo_real_total'], 2) }}</td>
-                                                            <td>${{ number_format($detalle['ganancia'], 2) }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div class="alert alert-info">No hay ventas para mostrar.</div>
-                                @endforelse
+                                <table class="table table-bordered table-striped mb-1">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Vendedor</th>
+                                            <th>Monto de venta</th>
+                                            <th>Costo Real</th>
+                                            <th>Ganancias</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($report as $row)
+                                            <tr>
+                                                <td>{{ $row['vendedor'] }}</td>
+                                                <td>${{ number_format($row['monto_venta'], 2) }}</td>
+                                                <td>${{ number_format($row['costo_real'], 2) }}</td>
+                                                <td>${{ number_format($row['ganancia'], 2) }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center">No hay ventas para mostrar.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

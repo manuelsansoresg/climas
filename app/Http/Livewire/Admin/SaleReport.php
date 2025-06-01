@@ -8,6 +8,7 @@ use App\Models\SaleDetail;
 use App\Models\WareHouse;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use App\Models\ProductEntry;
 
 class SaleReport extends Component
 {
@@ -46,61 +47,38 @@ class SaleReport extends Component
             ->when($dateFrom, fn($q) => $q->where('created_at', '>=', $dateFrom))
             ->when($dateTo, fn($q) => $q->where('created_at', '<=', $dateTo))
             ->when($userId, fn($q) => $q->where('user_id', $userId))
-            ->with(['user', 'client', 'details.product'])
+            ->with(['user', 'details'])
             ->orderBy('created_at', 'desc');
 
         $sales = $salesQuery->get();
 
         $report = [];
         foreach ($sales as $sale) {
-            $venta = [
-                'id' => $sale->id,
-                'fecha' => $sale->created_at,
-                'vendedor' => $sale->user->name ?? 'Sin usuario',
-                'cliente' => $sale->client->name ?? 'Sin cliente',
-                'total_venta' => $sale->total,
-                'detalles' => [],
-                'costo_real_total' => 0,
-                'ganancia_total' => 0,
-            ];
-            foreach ($sale->details as $detail) {
-                $quantity = $detail->quantity;
-                $precio_venta_unitario = $detail->price;
-                $subtotal_venta = $detail->quantity * $detail->price;
-                $costo_real_unitario = 0;
-                $costo_real_total = 0;
-                $restante = $quantity;
-                $warehouses = WareHouse::where('product_id', $detail->product_id)
-                    ->orderBy('fechaingresa')
-                    ->get();
-                foreach ($warehouses as $warehouse) {
-                    if ($warehouse->cantidad >= $restante) {
-                        $costo_real_unitario = $warehouse->costo_compra; // El último costo unitario usado
-                        $costo_real_total += $restante * $warehouse->costo_compra;
-                        break;
-                    } else {
-                        $costo_real_total += $warehouse->cantidad * $warehouse->costo_compra;
-                        $costo_real_unitario = $warehouse->costo_compra;
-                        $restante -= $warehouse->cantidad;
-                    }
-                    if ($restante <= 0) break;
-                }
-                $ganancia = $subtotal_venta - $costo_real_total;
-                $venta['detalles'][] = [
-                    'producto' => $detail->product->name ?? 'Sin nombre',
-                    'cantidad' => $quantity,
-                    'precio_venta_unitario' => $precio_venta_unitario,
-                    'subtotal_venta' => $subtotal_venta,
-                    'costo_real_unitario' => $costo_real_unitario,
-                    'costo_real_total' => $costo_real_total,
-                    'ganancia' => $ganancia,
+            $vendedorId = $sale->user_id;
+            $vendedorNombre = $sale->user->name ?? 'Sin usuario';
+            if (!isset($report[$vendedorId])) {
+                $report[$vendedorId] = [
+                    'vendedor' => $vendedorNombre,
+                    'monto_venta' => 0,
+                    'costo_real' => 0,
+                    'ganancia' => 0,
                 ];
-                $venta['costo_real_total'] += $costo_real_total;
-                $venta['ganancia_total'] += $ganancia;
             }
-            $report[] = $venta;
+            foreach ($sale->details as $detail) {
+                $monto_venta = $detail->price * $detail->quantity;
+                // Buscar la entrada más reciente anterior a la venta para el producto
+                $entrada = ProductEntry::where('product_id', $detail->product_id)
+                    ->orderByDesc('entry_date')
+                    ->first();
+                $costo_real = $entrada ? ($entrada->cost_price * $detail->quantity) : 0;
+                $ganancia = $monto_venta - $costo_real;
+                $report[$vendedorId]['monto_venta'] += $monto_venta;
+                $report[$vendedorId]['costo_real'] += $costo_real;
+                $report[$vendedorId]['ganancia'] += $ganancia;
+            }
         }
-
+        // Reindexar para la vista
+        $report = array_values($report);
         return view('livewire.admin.sale-report', [
             'users' => $users,
             'report' => $report,

@@ -22,6 +22,7 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
+                    <th>ID</th>
                     <th>Producto</th>
                     <th>Almacén</th>
                     <th>Cantidad</th>
@@ -32,6 +33,7 @@
                 <tbody>
                   @foreach($productEntries as $entry)
                   <tr>
+                    <td>{{ $entry->id }}</td>
                     <td>{{ $entry->product->name }}</td>
                     <td>{{ $entry->warehouse->name }}</td>
                     <td>{{ $entry->quantity }}</td>
