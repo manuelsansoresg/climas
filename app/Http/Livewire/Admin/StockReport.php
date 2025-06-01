@@ -8,8 +8,9 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Subcategory2;
 use App\Models\Subcategory3;
+use App\Models\ProductEntry;
+use App\Models\ProductSale;
 use App\Models\SaleDetail;
-use App\Models\WareHouse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -74,8 +75,8 @@ class StockReport extends Component
         $dateFrom = $this->appliedFilters['date_from'] ? Carbon::parse($this->appliedFilters['date_from'])->startOfDay() : null;
         $dateTo = $this->appliedFilters['date_to'] ? Carbon::parse($this->appliedFilters['date_to'])->endOfDay() : null;
 
-        $warehouseEntries = WareHouse::query()
-            ->with(['product.category', 'product.subcategory', 'product.subcategory2', 'product.subcategory3', 'user', 'provider'])
+        $productEntries = ProductEntry::query()
+            ->with(['product.category', 'product.subcategory', 'product.subcategory2', 'product.subcategory3', 'warehouse'])
             ->when($this->appliedFilters['category_id'], function($q) {
                 $q->whereHas('product', fn($q) => $q->where('category_id', $this->appliedFilters['category_id']));
             })
@@ -92,21 +93,22 @@ class StockReport extends Component
                 $q->whereHas('product', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($this->appliedFilters['name']) . '%']));
             })
             ->when($dateFrom, function($q) use ($dateFrom) {
-                $q->where('fechaingresa', '>=', $dateFrom);
+                $q->where('entry_date', '>=', $dateFrom);
             })
             ->when($dateTo, function($q) use ($dateTo) {
-                $q->where('fechaingresa', '<=', $dateTo);
+                $q->where('entry_date', '<=', $dateTo);
             })
-            ->orderBy('fechaingresa', 'asc')
+            ->orderBy('entry_date', 'asc')
             ->get()
             ->groupBy('product_id')
             ->map(function($productEntries, $productId) {
-                // Obtener el total vendido para este producto (en el rango de fechas de venta si se quiere)
+                // Obtener el total vendido para este producto
                 $totalVendidos = SaleDetail::where('product_id', $productId)->sum('quantity');
                 $vendidosRestantes = $totalVendidos;
                 $processedEntries = collect();
+                
                 foreach ($productEntries as $entry) {
-                    $entryStock = $entry->cantidad;
+                    $entryStock = $entry->quantity;
                     $entryVendidos = min($vendidosRestantes, $entryStock);
                     $entry->vendidos = $entryVendidos;
                     $entry->stock_restante = $entryStock - $entryVendidos;
@@ -117,6 +119,6 @@ class StockReport extends Component
             })
             ->flatten();
 
-        return view('livewire.admin.stock-report', compact('categories', 'subcategories', 'subcategories2', 'subcategories3', 'warehouseEntries'));
+        return view('livewire.admin.stock-report', compact('categories', 'subcategories', 'subcategories2', 'subcategories3', 'productEntries'));
     }
 }

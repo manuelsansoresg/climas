@@ -6,20 +6,6 @@
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
                             <h3 class="nk-block-title page-title">Reporte de stock de productos</h3>
-                        </div><!-- .nk-block-head-content -->
-                        <div class="nk-block-head-content">
-                            <div class="toggle-wrap nk-block-tools-toggle">
-                                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-more-v"></em></a>
-                                {{-- <div class="toggle-expand-content" data-content="pageMenu">
-                                    <ul class="nk-block-tools g-3">
-                                        <li class="nk-block-tools-opt">
-                                            <a href="{{ route('admin.clients.create') }}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-plus"></i> Nuevo Cliente
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div> --}}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,43 +78,29 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Producto</th>
-                                          {{--   <th>Categoría</th>
-                                            <th>Subcategoría</th>
-                                            <th>Subcategoría 2</th>
-                                            <th>Subcategoría 3</th> --}}
-                                            <th>Factura</th>
-                                            <th>Serie</th>
+                                            <th>Almacén</th>
                                             <th>Fecha Ingreso</th>
                                             <th>Costo Compra</th>
-                                            <th>Proveedor</th>
-                                            <th>Usuario</th>
                                             <th>Cantidad</th>
                                             <th>Vendidos</th>
                                             <th>Stock Restante</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($warehouseEntries as $entry)
+                                        @forelse($productEntries as $entry)
                                             <tr>
                                                 <td>{{ $entry->id }}</td>
                                                 <td>{{ $entry->product->name }}</td>
-                                              {{--   <td>{{ $entry->product->category->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->product->subcategory->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->product->subcategory2->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->product->subcategory3->name ?? 'N/A' }}</td> --}}
-                                                <td>{{ $entry->factura }}</td>
-                                                <td>{{ $entry->serie }}</td>
-                                                <td>{{ $entry->fechaingresa }}</td>
-                                                <td>{{ $entry->costo_compra }}</td>
-                                                <td>{{ $entry->provider->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->user->name ?? 'N/A' }}</td>
-                                                <td>{{ $entry->cantidad }}</td>
+                                                <td>{{ $entry->warehouse->name ?? 'N/A' }}</td>
+                                                <td>{{ $entry->entry_date->format('d/m/Y H:i') }}</td>
+                                                <td>{{ number_format($entry->cost_price, 2) }}</td>
+                                                <td>{{ $entry->quantity }}</td>
                                                 <td>{{ $entry->vendidos }}</td>
                                                 <td>{{ $entry->stock_restante }}</td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="15" class="text-center">No hay registros para mostrar.</td>
+                                                <td colspan="8" class="text-center">No hay registros para mostrar.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
