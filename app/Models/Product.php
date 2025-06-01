@@ -29,6 +29,22 @@ class Product extends Model
         'active'
     ];
 
+    public function averageCostByWarehouse($warehouseId)
+    {
+        $entries = $this->entries()->where('warehouse_id', $warehouseId)->get();
+
+        $totalQuantity = $entries->sum('quantity');
+        if ($totalQuantity == 0) {
+            return 0;
+        }
+
+        $totalCost = $entries->sum(function ($entry) {
+            return $entry->quantity * $entry->cost_price;
+        });
+
+        return $totalCost / $totalQuantity;
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
