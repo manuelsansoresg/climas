@@ -9,6 +9,7 @@ use App\Models\WareHouse;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use App\Models\ProductEntry;
+use App\Models\ProductSale;
 
 class SaleReport extends Component
 {
@@ -66,14 +67,51 @@ class SaleReport extends Component
             }
             foreach ($sale->details as $detail) {
                 $monto_venta = $detail->price * $detail->quantity;
-                // Buscar la entrada más reciente anterior a la venta para el producto
-                $entrada = ProductEntry::where('product_id', $detail->product_id)
-                    ->orderByDesc('entry_date')
-                    ->first();
-                $costo_real = $entrada ? ($entrada->cost_price * $detail->quantity) : 0;
-                $ganancia = $monto_venta - $costo_real;
+                
+                // Obtener todas las entradas del producto ordenadas por fecha ascendente
+                $entradas = ProductEntry::where('product_id', $detail->product_id)
+                    ->orderBy('entry_date', 'asc')
+                    ->get();
+
+                // Obtener todas las ventas anteriores a esta venta
+                $ventasAnteriores = ProductSale::where('product_id', $detail->product_id)
+                    ->where('sale_date', '<', $sale->created_at)
+                    ->orderBy('sale_date', 'asc')
+                    ->get();
+
+                // Calcular el stock disponible hasta el momento de la venta
+                $stockDisponible = [];
+                foreach ($entradas as $entrada) {
+                    $cantidadDisponible = $entrada->quantity;
+                    // Restar las ventas anteriores que afectan a esta entrada
+                    foreach ($ventasAnteriores as $ventaAnterior) {
+                        if ($cantidadDisponible > 0) {
+                            $cantidadAReducir = min($cantidadDisponible, $ventaAnterior->quantity);
+                            $cantidadDisponible -= $cantidadAReducir;
+                        }
+                    }
+                    if ($cantidadDisponible > 0) {
+                        $stockDisponible[] = [
+                            'cantidad' => $cantidadDisponible,
+                            'costo' => $entrada->cost_price
+                        ];
+                    }
+                }
+
+                // Calcular el costo real usando FIFO
+                $cantidadRestante = $detail->quantity;
+                $costoReal = 0;
+                foreach ($stockDisponible as $stock) {
+                    if ($cantidadRestante <= 0) break;
+                    
+                    $cantidadAUsar = min($cantidadRestante, $stock['cantidad']);
+                    $costoReal += $cantidadAUsar * $stock['costo'];
+                    $cantidadRestante -= $cantidadAUsar;
+                }
+
+                $ganancia = $monto_venta - $costoReal;
                 $report[$vendedorId]['monto_venta'] += $monto_venta;
-                $report[$vendedorId]['costo_real'] += $costo_real;
+                $report[$vendedorId]['costo_real'] += $costoReal;
                 $report[$vendedorId]['ganancia'] += $ganancia;
             }
         }
