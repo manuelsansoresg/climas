@@ -66,9 +66,22 @@ class Product extends Model
         return $this->hasMany(ProductSucursal::class);
     }
 
-    public function warehouses()
+    public function entries()
     {
-        return $this->hasMany(WareHouse::class);
+        return $this->hasMany(ProductEntry::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(ProductSale::class);
+    }
+
+    // Método para calcular stock actual
+    public function stock()
+    {
+        $entries = $this->entries()->sum('quantity');
+        $sales = $this->sales()->sum('quantity');
+        return $entries - $sales;
     }
 
     public function saleDetails()

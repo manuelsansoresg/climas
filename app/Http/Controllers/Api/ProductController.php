@@ -11,23 +11,19 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = $request->get('q');
-        
-        $products = Product::whereHas('warehouses', function ($q) {
-                $q->whereNull('deleted_at');
-            })
-            ->where(function ($q) use ($query) {
+
+        $products = Product::where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%");
+                ->orWhere('description', 'like', "%{$query}%");
             })
-            ->where('status', true)
+            ->where('active', true)
             ->take(10)
             ->get()
             ->map(function ($product) {
-                $warehouseQuantity = $product->warehouses()
-                    ->whereNull('deleted_at')
-                    ->sum('cantidad');
-                $salesQuantity = $product->saleDetails()->sum('quantity');
-                $availableStock = $warehouseQuantity - $salesQuantity;
+                $entriesQuantity = $product->entries()->sum('quantity');
+                $salesQuantity = $product->sales()->sum('quantity');
+                $availableStock = $entriesQuantity - $salesQuantity;
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -35,11 +31,11 @@ class ProductController extends Controller
                     'precio_mayorista' => $product->precio_mayorista,
                     'precio_distribuidor' => $product->precio_distribuidor,
                     'iva' => $product->iva,
-                    'stock' => $availableStock
+                    'stock' => $availableStock > 0 ? $availableStock : 0,
                 ];
             });
 
-        return response()->json($products);
+            return response()->json($products);
     }
 
     public function searchAll(Request $request)
