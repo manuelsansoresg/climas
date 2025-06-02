@@ -8,7 +8,7 @@
                     <div class="nk-block-head nk-block-head-sm">
                         <div class="nk-block-between">
                             <div class="nk-block-head-content">
-                                <h3 class="nk-block-title page-title">Crear Nuevo Cliente</h3>
+                                <h3 class="nk-block-title page-title">Crear Nuevo Usuario</h3>
                             </div><!-- .nk-block-head-content -->
                             <div class="nk-block-head-content">
                                 <div class="toggle-wrap nk-block-tools-toggle">
@@ -25,7 +25,7 @@
                     <div class="nk-block">
                         <div class="card">
                             <div class="card-body">
-                                <form action="{{ route('admin.clients.store') }}" method="POST">
+                                <form action="{{ route('admin.users.store') }}" method="POST">
                                     @csrf
                                     <div class="form-group">
                                         <label for="name">*Nombre</label>
@@ -105,10 +105,16 @@
 
                                     @if (auth()->user()->hasRole('Admin'))
                                         <div class="form-group">
-                                            <label for="client_type">Tipo de Cliente</label>
+                                            <label for="client_type">Tipo de Usuario</label>
                                             <select class="form-control @error('client_type') is-invalid @enderror"
                                                 id="client_type" name="client_type" required>
                                                 <option value="">Seleccione un tipo</option>
+                                                <option value="Vendedor"
+                                                    {{ old('client_type') == 'Vendedor' ? 'selected' : '' }}>
+                                                    Vendedor</option>
+                                                <option value="Almacen"
+                                                    {{ old('client_type') == 'Almacen' ? 'selected' : '' }}>
+                                                    Almacén</option>
                                                 <option value="Cliente mayorista"
                                                     {{ old('client_type') == 'Cliente mayorista' ? 'selected' : '' }}>
                                                     Cliente público en general</option>
@@ -129,7 +135,7 @@
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Guardar</button>
-                                        <a href="{{ route('admin.clients.index') }}"
+                                        <a href="{{ route('admin.users.index') }}"
                                             class="btn btn-secondary">Cancelar</a>
                                     </div>
                                 </form>

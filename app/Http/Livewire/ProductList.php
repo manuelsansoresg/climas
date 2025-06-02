@@ -62,7 +62,7 @@ class ProductList extends Component
 
     public function render()
     {
-        $query = Product::with(['category', 'warehouses', 'saleDetails']);
+        $query = Product::with(['category', 'entries', 'sales']);
 
         // Filtro por nombre
         if (!empty(trim($this->search))) {
@@ -92,9 +92,9 @@ class ProductList extends Component
             $query->where('precio_publico', '<=', $this->maxPrice);
         }
 
-        // Filtro de stock disponible
-        $query->whereHas('warehouses', function($q) {
-            $q->where('stock', '>', 0);
+        // Filtro de stock disponible usando FIFO
+        $query->whereHas('entries', function($q) {
+            $q->where('quantity', '>', 0);
         });
 
         // Ordenamiento
@@ -116,6 +116,11 @@ class ProductList extends Component
 
         $perPage = 12;
         $products = $query->paginate($perPage);
+
+        // Calcular el stock FIFO para cada producto
+        foreach ($products as $product) {
+            $product->stock = $product->fifo_stock;
+        }
 
         return view('livewire.product-list', [
             'products' => $products,

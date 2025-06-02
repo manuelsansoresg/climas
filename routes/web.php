@@ -21,10 +21,12 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'home'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'home'])
+    ->name('home')
+    ->middleware(['auth', 'check.home.roles']);
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vendedor,Admin'])->group(function () {
     // Category routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     
@@ -64,7 +66,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('sucursales', \App\Http\Controllers\Admin\SucursalController::class);
 
     // Client routesal
-    Route::resource('clients', \App\Http\Controllers\Admin\ClientController::class);
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
     // Sales routes
     Route::get('sales', [App\Http\Controllers\Admin\SaleController::class, 'index'])->name('sales.index');

@@ -106,9 +106,9 @@
                                     </ul><!-- .nk-menu-sub -->
                                 </li><!-- .nk-menu-item -->
                                 <li class="nk-menu-item">
-                                    <a href="/admin/clients" class="nk-menu-link">
+                                    <a href="/admin/users" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-user-list-fill"></em></span>
-                                        <span class="nk-menu-text">Clientes</span>
+                                        <span class="nk-menu-text">Usuarios</span>
                                     </a>
                                 </li><!-- .nk-menu-item -->
                               

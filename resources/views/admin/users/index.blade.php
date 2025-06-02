@@ -8,7 +8,7 @@
                 <div class="nk-block-head nk-block-head-sm">
                     <div class="nk-block-between">
                         <div class="nk-block-head-content">
-                            <h3 class="nk-block-title page-title">Clientes</h3>
+                            <h3 class="nk-block-title page-title">Usuarios</h3>
                         </div><!-- .nk-block-head-content -->
                         <div class="nk-block-head-content">
                             <div class="toggle-wrap nk-block-tools-toggle">
@@ -16,8 +16,8 @@
                                 <div class="toggle-expand-content" data-content="pageMenu">
                                     <ul class="nk-block-tools g-3">
                                         <li class="nk-block-tools-opt">
-                                            <a href="{{ route('admin.clients.create') }}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-plus"></i> Nuevo Cliente
+                                            <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus"></i> Nuevo Usuario
                                             </a>
                                         </li>
                                     </ul>
@@ -48,22 +48,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($clients as $client)
+                                    @foreach($users as $user)
                                     <tr>
-                                        <td>{{ $client->name }}</td>
-                                        <td>{{ $client->last_name }}</td>
-                                        <td>{{ $client->email }}</td>
-                                        <td>{{ $client->phone }}</td>
-                                        <td>{{ $client->rfc }}</td>
-                                        <td>{{ $client->roles->first()->name ?? 'No asignado' }}</td>
+                                        <td>{{ $user->name }}</td>
+                                        <td>{{ $user->last_name }}</td>
+                                        <td>{{ $user->email }}</td>
+                                        <td>{{ $user->phone }}</td>
+                                        <td>{{ $user->rfc }}</td>
+                                        <td>{{ $user->roles->first()->name ?? 'No asignado' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.clients.edit', $client) }}" class="btn btn-info btn-sm">
+                                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-info btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.clients.destroy', $client) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este cliente?')">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este usuario?')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

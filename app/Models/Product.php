@@ -92,32 +92,82 @@ class Product extends Model
         return $this->hasMany(ProductSale::class);
     }
 
-    // Método para calcular stock actual
-    public function stock()
-    {
-        $entries = $this->entries()->sum('quantity');
-        $sales = $this->sales()->sum('quantity');
-        return $entries - $sales;
-    }
-
     public function saleDetails()
     {
         return $this->hasMany(SaleDetail::class);
     }
     
     /**
+     * Calcula el stock disponible del producto usando el método FIFO
+     * @return int
+     */
+    public function getFifoStockAttribute()
+    {
+        // Obtener todas las entradas ordenadas por fecha (más antiguas primero)
+        $entries = $this->entries()
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        // Obtener todas las ventas ordenadas por fecha
+        $sales = $this->sales()
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        $remainingStock = 0;
+        $currentEntryIndex = 0;
+        
+        // Procesar cada venta
+        foreach ($sales as $sale) {
+            $remainingQuantity = $sale->quantity;
+            
+            // Mientras haya cantidad por procesar y entradas disponibles
+            while ($remainingQuantity > 0 && $currentEntryIndex < $entries->count()) {
+                $currentEntry = $entries[$currentEntryIndex];
+                $availableInEntry = $currentEntry->quantity;
+                
+                if ($availableInEntry >= $remainingQuantity) {
+                    // La entrada actual puede cubrir toda la venta
+                    $availableInEntry -= $remainingQuantity;
+                    $remainingQuantity = 0;
+                    
+                    if ($availableInEntry > 0) {
+                        // Actualizar la cantidad disponible en esta entrada
+                        $currentEntry->quantity = $availableInEntry;
+                    } else {
+                        // Esta entrada se agotó, pasar a la siguiente
+                        $currentEntryIndex++;
+                    }
+                } else {
+                    // La entrada actual no puede cubrir toda la venta
+                    $remainingQuantity -= $availableInEntry;
+                    $currentEntryIndex++;
+                }
+            }
+        }
+        
+        // Calcular el stock restante sumando las cantidades de las entradas no procesadas
+        for ($i = $currentEntryIndex; $i < $entries->count(); $i++) {
+            $remainingStock += $entries[$i]->quantity;
+        }
+        
+        return $remainingStock;
+    }
+
+    /**
      * Calcula el stock disponible del producto considerando las ventas
      * @return int
      */
     public function getAvailableStockAttribute()
     {
-        // Suma total de stock en almacén
-        $totalStock = $this->warehouses()->sum('cantidad');
-        
-        // Suma total de productos vendidos
-        $totalSold = $this->saleDetails()->sum('quantity');
-        
-        // Stock disponible = total en almacén - total vendido
-        return max(0, $totalStock - $totalSold);
+        return $this->getFifoStockAttribute();
+    }
+    
+    /**
+     * Método para calcular stock actual (mantenido por compatibilidad)
+     * @return int
+     */
+    public function stock()
+    {
+        return $this->getFifoStockAttribute();
     }
 }
