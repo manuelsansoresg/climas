@@ -33,7 +33,18 @@
                     <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="me-2">
                 </a>
                 <div class="d-flex align-items-center ms-auto">
-                    <a href="/login" class="btn text-primary me-2"><i class="fas fa-user fa-lg"></i></a>
+                    @guest
+                        <a href="/login" class="btn text-primary me-2"><i class="fas fa-user fa-lg"></i></a>
+                    @endguest
+
+                    @auth
+                        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn text-primary me-2">
+                                <i class="fas fa-sign-out-alt fa-lg"></i> Salir
+                            </button>
+                        </form>
+                    @endauth
                     <a href="#" class="btn text-primary position-relative">
                         <i class="fas fa-shopping-bag fa-lg"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
@@ -107,6 +118,8 @@
     </footer>
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/principal.js') }}"></script>
     <!-- Footer -->
     <!-- ... tu footer ... -->
 

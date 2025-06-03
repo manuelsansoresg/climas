@@ -17,7 +17,8 @@ class SaleDetail extends Model
         'subtotal',
         'iva',
         'total',
-        'price_type' // mayorista, distribuidor, instalador, publico
+        'price_type', // mayorista, distribuidor, instalador, publico
+        'payment_status' // pendiente, pagado, cancelado
     ];
 
     public function sale()

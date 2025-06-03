@@ -43,13 +43,27 @@
             
             </p>
             <div class="d-flex gap-2 mb-3">
-                <button class="btn btn-danger flex-grow-1">Agregar Al Carrito</button>
-                <button class="btn btn-outline-danger flex-grow-1">Comprar Ahora</button>
+                @auth
+                <button class="btn btn-danger flex-grow-1" id="add-to-cart-btn"
+                data-product-id="{{ $product->id }}"
+                data-url="{{ route('cart.add') }}"
+                data-csrf="{{ csrf_token() }}"
+            >Agregar al carrito</button>
+                @else
+                    @php
+                        $whatsappNumber = '+529991575581';
+                        $currentUrl = url()->current();
+                        $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode("Hola, quiero información sobre este producto: {$currentUrl}");
+                    @endphp
+                    <a href="{{ $whatsappUrl }}" target="_blank" class="btn btn-primary">Contactar por WhatsApp</a>
+                @endauth
+                {{-- <button class="btn btn-danger flex-grow-1">Agregar Al Carrito</button>
+                <button class="btn btn-outline-danger flex-grow-1">Comprar Ahora</button> --}}
             </div>
-            <div class="mt-4">
+            {{-- <div class="mt-4">
                 <p>Producto a un super precio.</p>
                <a href="#" class="btn btn-primary">Ver más</a>
-            </div>
+            </div> --}}
         </div>
     </div>
     <!-- Productos relacionados -->
