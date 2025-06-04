@@ -22,3 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/clients/search', [App\Http\Controllers\Admin\ClientController::class, 'search']);
 
 Route::get('/products/search', [ProductController::class, 'search']);
+
+Route::post('/admin-unlock-key/validate', [\App\Http\Controllers\Api\AdminUnlockKeyController::class, 'validateKey']);

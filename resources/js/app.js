@@ -469,7 +469,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 name: product.name,
                 stock: product.stock,
                 price: precioUnitario,
-                quantity: cantidad
+                quantity: cantidad,
+                real_cost: product.real_cost
             });
             renderProductsTable();
             $('#product-search').val(null).trigger('change');
@@ -489,7 +490,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <input type="number" name="products[${idx}][quantity]" value="${product.quantity}" min="1" max="${product.stock}" class="form-control form-control-sm quantity-input" data-idx="${idx}">
                     </td>
                     <td>${product.stock}</td>
-                    <td>$${parseFloat(product.price).toFixed(2)}</td>
+                    <td>${typeof product.real_cost !== 'undefined' && product.real_cost !== null ? '$' + parseFloat(product.real_cost).toFixed(2) : '-'}</td>
+                    <td><input type="number" name="products[${idx}][price]" value="${product.price}" min="0" class="form-control form-control-sm price-input" data-idx="${idx}"></td>
                     <td><button type="button" class="btn btn-danger btn-sm remove-product" data-idx="${idx}">Eliminar</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -517,22 +519,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('saleForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
+            // Sincronizar precios editados
+            document.querySelectorAll('.price-input').forEach(function(input) {
+                const idx = input.getAttribute('data-idx');
+                if (productsAdded[idx]) {
+                    productsAdded[idx].price = parseFloat(input.value);
+                }
+            });
+
             if (productsAdded.length === 0) {
                 alert('Debe agregar al menos un producto a la venta');
                 return;
             }
-
-            // Crear FormData con todos los datos del formulario
             const formData = new FormData(this);
-            
-            // Agregar los productos al FormData
             productsAdded.forEach((product, idx) => {
                 formData.append(`products[${idx}][product_id]`, product.id);
                 formData.append(`products[${idx}][quantity]`, product.quantity);
+                formData.append(`products[${idx}][price]`, product.price);
             });
-
-            // Enviar la solicitud
+            // Si ya se ingresó clave de autorización, agregarla
+            if (window.adminUnlockKey) {
+                formData.append('admin_unlock_key', window.adminUnlockKey);
+            }
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
@@ -540,15 +549,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             })
-            .then(response => {
+            .then(async response => {
+                let data;
+                try { data = await response.json(); } catch { data = {}; }
                 if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
+                    if (data.authorization_required) {
+                        showAuthorizationLink();
+                        return;
+                    }
+                    throw new Error(data.message || 'Error en la respuesta del servidor');
                 }
-                return response.json();
+                return data;
             })
             .then(data => {
+                if (!data) return;
                 if (data.success) {
                     window.location.href = data.redirect || '/admin/sales';
+                } else if (data.authorization_required) {
+                    showAuthorizationLink();
                 } else {
                     alert(data.message || 'Error al crear la venta');
                 }
@@ -559,15 +577,81 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Función para actualizar los precios de los productos agregados si cambia el cliente
-        function actualizarPreciosPorRol() {
-            productsAdded.forEach((product, idx) => {
-                const lastProduct = lastProductResults[product.id];
-                if (lastProduct) {
-                    product.price = obtenerPrecioPorRol(lastProduct, clienteSeleccionado.role);
-                }
+        // Mostrar link y modal de autorización
+        function showAuthorizationLink() {
+            if (document.getElementById('authorization-link')) return;
+            // Mover el link arriba del botón Crear Venta
+            const form = document.getElementById('saleForm');
+            const submitRow = form.querySelector('.row.g-4.mt-2 .btn-success').parentElement;
+            const authDiv = document.createElement('div');
+            authDiv.className = 'mt-2';
+            authDiv.innerHTML = `Pedir autorización para venta bajo costo real<a href="#" id="authorization-link" class="ink-underline-primary"> Autorizar </a>`;
+            submitRow.insertBefore(authDiv, submitRow.firstChild);
+            document.getElementById('authorization-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAuthorizationModal();
             });
-            renderProductsTable();
+        }
+        function showAuthorizationModal() {
+            if (document.getElementById('authorization-modal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'authorization-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.innerHTML = `
+                <div style="background:#fff;padding:30px;border-radius:8px;min-width:300px;max-width:90vw;">
+                    <h5>Autorización requerida</h5>
+                    <p>Ingrese la clave de autorización de administrador:</p>
+                    <input type="password" id="admin-unlock-key-input" class="form-control mb-2" placeholder="Clave de administrador">
+                    <div id="admin-unlock-error" style="color:red;display:none;"></div>
+                    <button id="admin-unlock-submit" class="btn btn-primary">Desbloquear</button>
+                    <button id="admin-unlock-cancel" class="btn btn-secondary ms-2">Cancelar</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('admin-unlock-cancel').onclick = function() {
+                modal.remove();
+            };
+            document.getElementById('admin-unlock-submit').onclick = function() {
+                const key = document.getElementById('admin-unlock-key-input').value;
+                if (!key) {
+                    document.getElementById('admin-unlock-error').textContent = 'Debe ingresar una clave.';
+                    document.getElementById('admin-unlock-error').style.display = 'block';
+                    return;
+                }
+                // Validar clave por AJAX
+                fetch('/api/admin-unlock-key/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ key })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.valid) {
+                        window.adminUnlockKey = key;
+                        modal.remove();
+                        // Reintentar submit
+                        document.getElementById('saleForm').dispatchEvent(new Event('submit'));
+                    } else {
+                        document.getElementById('admin-unlock-error').textContent = 'Clave incorrecta.';
+                        document.getElementById('admin-unlock-error').style.display = 'block';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('admin-unlock-error').textContent = 'Error validando la clave.';
+                    document.getElementById('admin-unlock-error').style.display = 'block';
+                });
+            };
         }
     }
 

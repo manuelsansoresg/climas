@@ -29,7 +29,7 @@
                                 <div class="row g-4">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="form-label" for="client-search">Cliente</label>
+                                            <label class="form-label" for="client-search">*Cliente</label>
                                             <select id="client-search" name="client_id" class="form-control" style="width:100%" required></select>
                                             @error('client_id')
                                                 <span class="invalid-feedback">{{ $message }}</span>
@@ -103,6 +103,7 @@
                                                             <th>Nombre</th>
                                                             <th>Cantidad</th>
                                                             <th>Stock</th>
+                                                            <th>Costo real</th>
                                                             <th>Precio Unitario</th>
                                                             <th>Acciones</th>
                                                         </tr>

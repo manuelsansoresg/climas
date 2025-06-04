@@ -11,6 +11,7 @@ use App\Models\SaleDetail;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SaleController extends Controller
 {
@@ -62,10 +63,38 @@ class SaleController extends Controller
                 }
             }
 
+            // Validar precio unitario vs costo real para usuarios no admin
+            $user = auth()->user();
+            $isAdmin = false;
+            if ($user && method_exists($user, 'hasAnyRole')) {
+                $isAdmin = $user->hasAnyRole(['Admin']);
+            }
+            Log::info('Venta: usuario autenticado', ['user_id' => $user ? $user->id : null, 'is_admin' => $isAdmin]);
+            
+            $needsAuthorization = false;
+            $authorizationKey = $request->input('admin_unlock_key');
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $realCost = $product->latestEntryCost();
+                $unitPrice = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
+                if (!$isAdmin && $realCost !== null && $unitPrice <= $realCost) {
+                    $needsAuthorization = true;
+                }
+            }
+            if ($needsAuthorization) {
+                if (!$authorizationKey || !\App\Models\AdminUnlockKey::validateKey($authorizationKey)) {
+                    return response()->json([
+                        'success' => false,
+                        'authorization_required' => true,
+                        'message' => 'Se requiere autorización para vender por debajo del costo real. Clave incorrecta o no proporcionada.'
+                    ], 422);
+                }
+            }
+
             // Calcular totales
             foreach ($request->products as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                $price = $this->getPriceByUserRole($product, $request->client_id);
+                $price = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
                 $itemSubtotal = $price * $item['quantity'];
                 $itemIva = $itemSubtotal * ($product->iva / 100);
                 $subtotal += $itemSubtotal;
@@ -88,7 +117,7 @@ class SaleController extends Controller
             // Create sale details
             foreach ($request->products as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                $price = $this->getPriceByUserRole($product, $request->client_id);
+                $price = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
                 $itemSubtotal = $price * $item['quantity'];
                 $itemIva = $itemSubtotal * ($product->iva / 100);
 

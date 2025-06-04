@@ -170,4 +170,14 @@ class Product extends Model
     {
         return $this->getFifoStockAttribute();
     }
+
+    /**
+     * Get the latest available entry cost (real cost) for this product.
+     * @return float|null
+     */
+    public function latestEntryCost()
+    {
+        $entry = $this->entries()->orderByDesc('entry_date')->orderByDesc('id')->first();
+        return $entry ? $entry->cost_price : null;
+    }
 }

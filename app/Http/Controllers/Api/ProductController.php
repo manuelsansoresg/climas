@@ -27,6 +27,7 @@ class ProductController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
+                    'real_cost' => $product->latestEntryCost(),
                     'precio_publico' => $product->precio_publico,
                     'precio_mayorista' => $product->precio_mayorista,
                     'precio_distribuidor' => $product->precio_distribuidor,
