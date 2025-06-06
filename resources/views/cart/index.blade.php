@@ -116,15 +116,21 @@
                                                         name="quantity"
                                                         value="{{ $item->quantity }}"
                                                         min="1"
-                                                        max="{{ (int) $item->product->stock }}"
+                                                        max="{{ (int) $item->product->stock() }}"
                                                         class="form-control form-control-sm quantity-input"
                                                         data-product-id="{{ $item->product->id }}"
-                                                        data-current-stock="{{ (int) $item->product->stock }}"
+                                                        data-current-stock="{{ (int) $item->product->stock() }}"
                                                         autocomplete="off"
                                                         style="width: 70px;" />
                                                     <button type="submit" class="btn btn-primary btn-sm update-btn">Actualizar</button>
                                                     <span class="badge rounded-pill bg-secondary stock-badge" style="font-size: 1em;">
-                                                        Stock: <span class="stock-value">{{ (int) $item->product->stock }}</span>
+                                                        Stock: <span class="stock-value">
+                                                            @if ((int) $item->product->stock() > 0)
+                                                                {{ (int) $item->product->stock() }}
+                                                            @else
+                                                                Sin stock
+                                                            @endif
+                                                        </span>
                                                     </span>
                                                 </div>
                                                 <span class="stock-warning d-none text-danger" style="font-size:0.95em;">
@@ -146,7 +152,7 @@
                             </tbody>
                         </table>
 
-                        <form action="{{ route('cart.checkout') }}" method="POST" class="text-center">
+                        <form id="cart-checkout-form" action="{{ route('cart.checkout') }}" method="POST" class="text-center">
                             @csrf
                             <button type="submit" class="btn btn-success">Realizar compra</button>
                         </form>

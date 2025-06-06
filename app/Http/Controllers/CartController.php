@@ -125,6 +125,7 @@ class CartController extends Controller
         try {
             $sale = Sale::create([
                 'user_id' => Auth::id(),
+                'client_id' => Auth::id(),
                 'total' => 0, // se calculará abajo
             ]);
 
@@ -159,5 +160,36 @@ class CartController extends Controller
             DB::rollBack();
             return redirect()->route('cart.index')->withErrors('Error al realizar la venta: ' . $e->getMessage());
         }
+    }
+
+    // Validar stock de todos los productos del carrito (AJAX)
+    public function validateCartStock(Request $request)
+    {
+        $cart = $this->getUserCart()->load('items.product');
+        $errors = [];
+        $stockUpdates = [];
+
+        foreach ($cart->items as $item) {
+            $stock = $item->product->stock();
+            $stockUpdates[$item->id] = $stock;
+            if ($item->quantity > $stock) {
+                $errors[] = [
+                    'item_id' => $item->id,
+                    'product_name' => $item->product->name,
+                    'requested' => $item->quantity,
+                    'available' => $stock
+                ];
+            }
+        }
+
+        if (count($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors,
+                'stockUpdates' => $stockUpdates
+            ], 400);
+        }
+
+        return response()->json(['success' => true, 'stockUpdates' => $stockUpdates]);
     }
 }

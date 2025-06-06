@@ -130,9 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const stockBadge = form.querySelector('.stock-badge');
         const stockWarning = form.querySelector('.stock-warning');
         const stockValue = form.querySelector('.stock-value');
-        const maxStock = parseInt(input.getAttribute('data-current-stock'));
+        let maxStock = parseInt(input.getAttribute('data-current-stock'));
+        const productId = input.getAttribute('data-product-id');
 
-        function validateQuantity() {
+        function updateStockUI(stock) {
+            maxStock = parseInt(stock);
+            input.setAttribute('data-current-stock', maxStock);
+            input.max = maxStock;
             if (isNaN(maxStock) || maxStock < 1) {
                 stockValue.textContent = 'Sin stock';
                 stockBadge.classList.remove('bg-secondary', 'bg-danger');
@@ -162,10 +166,87 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Validar al cargar
-        validateQuantity();
-        // Validar en cada cambio
-        input.addEventListener('input', validateQuantity);
+        updateStockUI(maxStock);
+        // Validar y consultar stock en cada cambio
+        input.addEventListener('input', function() {
+            fetch(`/api/product/${productId}/stock`)
+                .then(res => res.json())
+                .then(data => {
+                    updateStockUI(data.stock);
+                });
+        });
     });
+
+    // Validar stock de todo el carrito antes de checkout
+    const checkoutForm = document.getElementById('cart-checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/api/cart/validate-stock', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(async res => {
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw data;
+                }
+                return res.json();
+            })
+            .then(data => {
+                // Si todo ok, enviar el formulario
+                checkoutForm.submit();
+            })
+            .catch(error => {
+                // Mostrar errores y actualizar stocks
+                if (error && error.errors) {
+                    error.errors.forEach(err => {
+                        const form = document.querySelector(`form[action*="/cart/item/${err.item_id}/update"]`);
+                        if (form) {
+                            const stockValue = form.querySelector('.stock-value');
+                            const stockBadge = form.querySelector('.stock-badge');
+                            stockValue.textContent = err.available > 0 ? err.available : 'Sin stock';
+                            if (err.available < 1) {
+                                stockBadge.classList.remove('bg-secondary', 'bg-danger');
+                                stockBadge.classList.add('bg-dark', 'text-white');
+                            } else {
+                                stockBadge.classList.remove('bg-secondary');
+                                stockBadge.classList.add('bg-danger', 'text-white');
+                            }
+                            const input = form.querySelector('.quantity-input');
+                            input.value = err.available > 0 ? err.available : 1;
+                            input.max = err.available;
+                            input.disabled = err.available < 1;
+                            const updateBtn = form.querySelector('.update-btn');
+                            updateBtn.disabled = true;
+                            const stockWarning = form.querySelector('.stock-warning');
+                            stockWarning.classList.remove('d-none');
+                            stockWarning.textContent = `La cantidad solicitada excede el stock disponible (${err.available})`;
+                        }
+                    });
+                    // Mostrar alerta general
+                    const container = document.querySelector('.container');
+                    const card = document.querySelector('.card');
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        Algunos productos no tienen suficiente stock. Por favor revisa las cantidades.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    if (container) {
+                        if (card && card.parentNode === container) {
+                            container.insertBefore(alertDiv, card);
+                        } else {
+                            container.insertBefore(alertDiv, container.firstChild);
+                        }
+                    }
+                }
+            });
+        });
+    }
 
     // Funcionalidad para cerrar alertas
     document.querySelectorAll('.alert .close-btn, .alert .btn-close').forEach(btn => {

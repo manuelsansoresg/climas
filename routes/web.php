@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/products/search', [App\Http\Controllers\Api\ProductController::class, 'search']);
     Route::get('/api/products/all/search', [App\Http\Controllers\Api\ProductController::class, 'searchAll']);
     Route::get('/api/product/{id}/stock', [App\Http\Controllers\Api\ProductController::class, 'stock']);
+    Route::post('/api/cart/validate-stock', [CartController::class, 'validateCartStock']);
 });
 
 Route::middleware('auth')->group(function () {
