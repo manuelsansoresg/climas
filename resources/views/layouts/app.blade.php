@@ -24,8 +24,8 @@
     <!-- Livewire Styles -->
     @livewireStyles
 </head>
-<body>
-    <div id="app">
+<body style="background-color: white;" class="d-flex flex-column min-vh-100">
+    <div id="app" class="flex-grow-1 d-flex flex-column">
         <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 shadow-sm">
             <div class="container-fluid">
                 <button class="btn text-primary me-2 d-lg-none" id="sidebarToggle"><i class="fas fa-bars fa-lg"></i></button>
@@ -45,13 +45,14 @@
                             </button>
                         </form>
                     @endauth
-                    <a href="#" class="btn text-primary position-relative">
+                    <a href="/cart" class="btn text-primary position-relative">
                         <i class="fas fa-shopping-bag fa-lg"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
                     </a>
                 </div>
             </div>
         </nav>
+
         <!-- Search Overlay -->
         <div id="searchOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background:rgba(255,255,255,0.95);z-index:1050;">
             <div class="d-flex justify-content-center align-items-start pt-5">
@@ -62,14 +63,14 @@
                 </div>
             </div>
         </div>
-        <main class="py-4">
+
+        <main class="py-4 flex-grow-1 d-flex flex-column justify-content-center">
             @yield('content')
         </main>
     </div>
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Footer -->
-    <footer class="bg-white shadow-lg mt-5">
+    <footer class="bg-white shadow-lg mt-auto">
         <div class="container py-5">
             <div class="row">
                 <div class="col-lg-4 mb-4 mb-lg-0">
@@ -116,12 +117,11 @@
             </div>
         </div>
     </footer>
+
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('js/principal.js') }}"></script>
-    <!-- Footer -->
-    <!-- ... tu footer ... -->
 
     <!-- Livewire Scripts -->
     @livewireScripts

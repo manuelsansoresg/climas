@@ -35,17 +35,29 @@ class CartController extends Controller
         ]);
 
         $cart = $this->getUserCart();
-
         $quantity = $request->input('quantity', 1);
         $productId = $request->product_id;
+
+        $product = Product::findOrFail($productId);
+        $availableStock = $product->getAvailableStockAttribute();
 
         $cartItem = CartItem::where('cart_id', $cart->id)
             ->where('product_id', $productId)
             ->first();
 
+        $currentQuantity = $cartItem ? $cartItem->quantity : 0;
+        $newTotal = $currentQuantity + $quantity;
+
+        if ($availableStock <= 0) {
+            return response()->json(['message' => 'No hay stock disponible para este producto.'], 400);
+        }
+        if ($newTotal > $availableStock) {
+            return response()->json(['message' => 'No puedes agregar más de ' . $availableStock . ' unidades al carrito.'], 400);
+        }
+
         if ($cartItem) {
-            $cartItem->quantity += $quantity;
-            $cartItem->save();
+            // Si ya está en el carrito, solo mostrar mensaje
+            return response()->json(['message' => 'El producto ya fue agregado al carrito. Puedes actualizar la cantidad desde el carrito.'], 200);
         } else {
             CartItem::create([
                 'cart_id' => $cart->id,

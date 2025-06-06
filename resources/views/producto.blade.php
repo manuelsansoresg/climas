@@ -42,12 +42,17 @@
                 {{ $getStock < 5 ? 'Bajas existencias' : 'Existencias' }}: quedan {{ $getStock }}
             
             </p>
+            <div class="mb-2">
+                <label for="quantity" class="form-label">Cantidad:</label>
+                <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="{{ $getStock }}" style="width: 100px; display: inline-block;">
+            </div>
             <div class="d-flex gap-2 mb-3">
                 @auth
                 <button class="btn btn-danger flex-grow-1" id="add-to-cart-btn"
                 data-product-id="{{ $product->id }}"
                 data-url="{{ route('cart.add') }}"
                 data-csrf="{{ csrf_token() }}"
+                data-stock="{{ $getStock }}"
             >Agregar al carrito</button>
                 @else
                     @php

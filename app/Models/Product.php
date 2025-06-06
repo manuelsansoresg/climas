@@ -98,77 +98,23 @@ class Product extends Model
     }
     
     /**
-     * Calcula el stock disponible del producto usando el método FIFO
-     * @return int
-     */
-    public function getFifoStockAttribute()
-    {
-        // Obtener todas las entradas ordenadas por fecha (más antiguas primero)
-        $entries = $this->entries()
-            ->orderBy('created_at', 'asc')
-            ->get();
-            
-        // Obtener todas las ventas ordenadas por fecha
-        $sales = $this->sales()
-            ->orderBy('created_at', 'asc')
-            ->get();
-            
-        $remainingStock = 0;
-        $currentEntryIndex = 0;
-        
-        // Procesar cada venta
-        foreach ($sales as $sale) {
-            $remainingQuantity = $sale->quantity;
-            
-            // Mientras haya cantidad por procesar y entradas disponibles
-            while ($remainingQuantity > 0 && $currentEntryIndex < $entries->count()) {
-                $currentEntry = $entries[$currentEntryIndex];
-                $availableInEntry = $currentEntry->quantity;
-                
-                if ($availableInEntry >= $remainingQuantity) {
-                    // La entrada actual puede cubrir toda la venta
-                    $availableInEntry -= $remainingQuantity;
-                    $remainingQuantity = 0;
-                    
-                    if ($availableInEntry > 0) {
-                        // Actualizar la cantidad disponible en esta entrada
-                        $currentEntry->quantity = $availableInEntry;
-                    } else {
-                        // Esta entrada se agotó, pasar a la siguiente
-                        $currentEntryIndex++;
-                    }
-                } else {
-                    // La entrada actual no puede cubrir toda la venta
-                    $remainingQuantity -= $availableInEntry;
-                    $currentEntryIndex++;
-                }
-            }
-        }
-        
-        // Calcular el stock restante sumando las cantidades de las entradas no procesadas
-        for ($i = $currentEntryIndex; $i < $entries->count(); $i++) {
-            $remainingStock += $entries[$i]->quantity;
-        }
-        
-        return $remainingStock;
-    }
-
-    /**
-     * Calcula el stock disponible del producto considerando las ventas
+     * Calcula el stock disponible del producto usando entradas y salidas
      * @return int
      */
     public function getAvailableStockAttribute()
     {
-        return $this->getFifoStockAttribute();
+        $totalEntries = $this->entries()->sum('quantity');
+        $totalSales = $this->sales()->sum('quantity');
+        return $totalEntries - $totalSales;
     }
     
     /**
-     * Método para calcular stock actual (mantenido por compatibilidad)
+     * Método para calcular stock actual
      * @return int
      */
     public function stock()
     {
-        return $this->getFifoStockAttribute();
+        return $this->getAvailableStockAttribute();
     }
 
     /**
@@ -179,5 +125,17 @@ class Product extends Model
     {
         $entry = $this->entries()->orderByDesc('entry_date')->orderByDesc('id')->first();
         return $entry ? $entry->cost_price : null;
+    }
+
+    public function getPriceForUser()
+    {
+        if (auth()->check()) {
+            if (auth()->user()->hasRole('Cliente mayorista')) {
+                return $this->precio_mayorista;
+            } elseif (auth()->user()->hasRole('Cliente instalador')) {
+                return $this->precio_instalador;
+            }
+        }
+        return $this->precio_publico;
     }
 }

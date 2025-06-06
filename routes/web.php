@@ -93,6 +93,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/products/search', [App\Http\Controllers\Api\ProductController::class, 'search']);
     Route::get('/api/products/all/search', [App\Http\Controllers\Api\ProductController::class, 'searchAll']);
+    Route::get('/api/product/{id}/stock', [App\Http\Controllers\Api\ProductController::class, 'stock']);
 });
 
 Route::middleware('auth')->group(function () {

@@ -53,4 +53,10 @@ class ProductController extends Controller
         return response()->json($products);
         
     }
+
+    public function stock($id)
+    {
+        $product = \App\Models\Product::findOrFail($id);
+        return response()->json(['stock' => $product->getAvailableStockAttribute()]);
+    }
 } 
