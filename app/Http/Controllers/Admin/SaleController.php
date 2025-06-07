@@ -111,7 +111,7 @@ class SaleController extends Controller
                 'total' => $total,
                 'payment_method' => $request->payment_method,
                 'notes' => $request->notes,
-                'status' => 'completed',
+                'status' => $request->status,
                 'payment_status' => 'paid'
             ]);
             // Create sale details

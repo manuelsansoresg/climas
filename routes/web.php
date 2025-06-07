@@ -68,6 +68,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
 
     // Client routesal
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    
+    Route::resource('sales', \App\Http\Controllers\Admin\SaleController::class);
 
     // Sales routes
     Route::get('sales', [App\Http\Controllers\Admin\SaleController::class, 'index'])->name('sales.index');

@@ -114,7 +114,7 @@ class CartController extends Controller
 
         // Validar stock antes de proceder
         foreach ($cart->items as $item) {
-            $availableStock = $item->product->stock(); // Usamos el método stock()
+            $availableStock = $item->product->stock();
             if ($item->quantity > $availableStock) {
                 return redirect()->route('cart.index')->withErrors("No hay suficiente stock para el producto {$item->product->name}. Stock disponible: {$availableStock}");
             }
@@ -123,31 +123,56 @@ class CartController extends Controller
         DB::beginTransaction();
 
         try {
-            $sale = Sale::create([
+            $subtotal = 0;
+            $iva = 0;
+            $total = 0;
+            $status = 'completed';
+            $payment_status = 'pending';
+            $warehouse_id = 1;
+            $payment_method = 'transfer';
+            $notes = null;
+            $folio = \App\Models\Sale::generateUniqueFolio();
+
+            // Calcular totales
+            foreach ($cart->items as $item) {
+                $price = $item->product->getPriceForUser();
+                $itemSubtotal = $price * $item->quantity;
+                $itemIva = $itemSubtotal * ($item->product->iva / 100);
+                $subtotal += $itemSubtotal;
+                $iva += $itemIva;
+            }
+            $total = $subtotal + $iva;
+
+            $sale = \App\Models\Sale::create([
                 'user_id' => Auth::id(),
                 'client_id' => Auth::id(),
-                'total' => 0, // se calculará abajo
+                'subtotal' => $subtotal,
+                'iva' => $iva,
+                'total' => $total,
+                'status' => $status,
+                'folio' => $folio,
+                'warehouse_id' => $warehouse_id,
+                'payment_method' => $payment_method,
+                'payment_status' => $payment_status,
+                'notes' => $notes,
             ]);
 
-            $total = 0;
-
             foreach ($cart->items as $item) {
-                $price = $item->product->price; // Asumo que el producto tiene campo price
-                $subtotal = $price * $item->quantity;
-
-                SaleDetail::create([
+                $price = $item->product->getPriceForUser();
+                $itemSubtotal = $price * $item->quantity;
+                $itemIva = $itemSubtotal * ($item->product->iva / 100);
+                $itemTotal = $itemSubtotal + $itemIva;
+                \App\Models\SaleDetail::create([
                     'sale_id' => $sale->id,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'price' => $price,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $itemSubtotal,
+                    'iva' => $itemIva,
+                    'total' => $itemTotal,
+                    'price_type' => SaleDetail::getUserRole(),
                 ]);
-
-                $total += $subtotal;
             }
-
-            $sale->total = $total;
-            $sale->save();
 
             // Vaciar carrito
             $cart->items()->delete();

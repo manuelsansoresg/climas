@@ -1,8 +1,8 @@
 <?php
 return [    
     'sale_status' => [
-        'Pendiente' => 1,
-        'Pagado' => 2,
-        'Cancelado' => 3,
+        'Pendiente' => 'pending',
+        'Pagado' => 'completed',
+        'Cancelado' => 'cancelled',
     ],
 ];
