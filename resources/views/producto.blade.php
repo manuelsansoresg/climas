@@ -49,11 +49,12 @@
             <div class="d-flex gap-2 mb-3">
                 @auth
                 <button class="btn btn-danger flex-grow-1" id="add-to-cart-btn"
-                data-product-id="{{ $product->id }}"
-                data-url="{{ route('cart.add') }}"
-                data-csrf="{{ csrf_token() }}"
-                data-stock="{{ $getStock }}"
-            >Agregar al carrito</button>
+                    data-product-id="{{ $product->id }}"
+                    data-url="{{ route('cart.add') }}"
+                    data-csrf="{{ csrf_token() }}"
+                    data-stock="{{ $getStock }}"
+                    onclick="addToCart(this); Livewire.emit('cartUpdated');"
+                >Agregar al carrito</button>
                 @else
                     @php
                         $whatsappNumber = '+529991575581';

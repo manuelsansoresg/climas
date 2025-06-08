@@ -156,7 +156,7 @@
 
                         <form id="cart-checkout-form" action="{{ route('cart.checkout') }}" method="POST" class="text-center">
                             @csrf
-                            <button type="submit" class="btn btn-success">Realizar compra</button>
+                            <button type="submit" class="btn btn-success" id="checkout-btn">Realizar compra</button>
                         </form>
                     @endif
                 </div>

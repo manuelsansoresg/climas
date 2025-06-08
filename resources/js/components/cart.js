@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 document.addEventListener('DOMContentLoaded', function() {
     // Funcionalidad para agregar al carrito
     const btn = document.getElementById('add-to-cart-btn');
@@ -182,69 +184,64 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            fetch('/api/cart/validate-stock', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            })
-            .then(async res => {
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw data;
-                }
-                return res.json();
-            })
-            .then(data => {
-                // Si todo ok, enviar el formulario
-                checkoutForm.submit();
-            })
-            .catch(error => {
-                // Mostrar errores y actualizar stocks
-                if (error && error.errors) {
-                    error.errors.forEach(err => {
-                        const form = document.querySelector(`form[action*="/cart/item/${err.item_id}/update"]`);
-                        if (form) {
-                            const stockValue = form.querySelector('.stock-value');
-                            const stockBadge = form.querySelector('.stock-badge');
-                            stockValue.textContent = err.available > 0 ? err.available : 'Sin stock';
-                            if (err.available < 1) {
-                                stockBadge.classList.remove('bg-secondary', 'bg-danger');
-                                stockBadge.classList.add('bg-dark', 'text-white');
-                            } else {
-                                stockBadge.classList.remove('bg-secondary');
-                                stockBadge.classList.add('bg-danger', 'text-white');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Validando...';
+
+            axios.post('/api/cart/validate-stock')
+                .then(response => {
+                    // Si todo ok, enviar el formulario
+                    checkoutForm.submit();
+                })
+                .catch(error => {
+                    // Restaurar el botón
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.innerHTML = 'Realizar compra';
+
+                    // Mostrar errores y actualizar stocks
+                    if (error.response && error.response.data && error.response.data.errors) {
+                        error.response.data.errors.forEach(err => {
+                            const form = document.querySelector(`form[action*="/cart/item/${err.item_id}/update"]`);
+                            if (form) {
+                                const stockValue = form.querySelector('.stock-value');
+                                const stockBadge = form.querySelector('.stock-badge');
+                                stockValue.textContent = err.available > 0 ? err.available : 'Sin stock';
+                                if (err.available < 1) {
+                                    stockBadge.classList.remove('bg-secondary', 'bg-danger');
+                                    stockBadge.classList.add('bg-dark', 'text-white');
+                                } else {
+                                    stockBadge.classList.remove('bg-secondary');
+                                    stockBadge.classList.add('bg-danger', 'text-white');
+                                }
+                                const input = form.querySelector('.quantity-input');
+                                input.value = err.available > 0 ? err.available : 1;
+                                input.max = err.available;
+                                input.disabled = err.available < 1;
+                                const updateBtn = form.querySelector('.update-btn');
+                                updateBtn.disabled = true;
+                                const stockWarning = form.querySelector('.stock-warning');
+                                stockWarning.classList.remove('d-none');
+                                stockWarning.textContent = `La cantidad solicitada excede el stock disponible (${err.available})`;
                             }
-                            const input = form.querySelector('.quantity-input');
-                            input.value = err.available > 0 ? err.available : 1;
-                            input.max = err.available;
-                            input.disabled = err.available < 1;
-                            const updateBtn = form.querySelector('.update-btn');
-                            updateBtn.disabled = true;
-                            const stockWarning = form.querySelector('.stock-warning');
-                            stockWarning.classList.remove('d-none');
-                            stockWarning.textContent = `La cantidad solicitada excede el stock disponible (${err.available})`;
-                        }
-                    });
-                    // Mostrar alerta general
-                    const container = document.querySelector('.container');
-                    const card = document.querySelector('.card');
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-                    alertDiv.innerHTML = `
-                        Algunos productos no tienen suficiente stock. Por favor revisa las cantidades.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    `;
-                    if (container) {
-                        if (card && card.parentNode === container) {
-                            container.insertBefore(alertDiv, card);
-                        } else {
-                            container.insertBefore(alertDiv, container.firstChild);
+                        });
+                        // Mostrar alerta general
+                        const container = document.querySelector('.container');
+                        const card = document.querySelector('.card');
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            Algunos productos no tienen suficiente stock. Por favor revisa las cantidades.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        if (container) {
+                            if (card && card.parentNode === container) {
+                                container.insertBefore(alertDiv, card);
+                            } else {
+                                container.insertBefore(alertDiv, container.firstChild);
+                            }
                         }
                     }
-                }
-            });
+                });
         });
     }
 

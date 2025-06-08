@@ -1,4 +1,4 @@
-<div wire:poll.5s>
+<div wire:poll.5s wire:ignore.self>
     <a href="/cart" class="btn text-primary position-relative">
         <i class="fas fa-shopping-bag fa-lg"></i>
         @if($count > 0)
