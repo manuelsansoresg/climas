@@ -325,7 +325,7 @@ class SaleController extends Controller
                     'price_type' => Sale::getUserRole()
                 ]);
 
-                if ($request->status == 2) { //pagado
+                if ($request->status == 'completed') { //pagado
                     // Crear salida en inventario
                     ProductSale::create([
                         'product_id' => $item['product_id'],

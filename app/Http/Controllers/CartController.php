@@ -10,6 +10,7 @@ use App\Models\SaleDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+// use Livewire\Livewire; // No longer needed
 
 class CartController extends Controller
 {
@@ -66,6 +67,7 @@ class CartController extends Controller
             ]);
         }
 
+        // $this->emitCartUpdated(); // Removed
         return response()->json(['message' => 'Producto agregado al carrito']);
     }
 
@@ -89,6 +91,7 @@ class CartController extends Controller
         $item->quantity = $request->quantity;
         $item->save();
 
+        // $this->emitCartUpdated(); // Removed
         return redirect()->back()->with('success', 'Cantidad actualizada');
     }
 
@@ -100,6 +103,7 @@ class CartController extends Controller
         $item = CartItem::where('cart_id', $cart->id)->where('id', $itemId)->firstOrFail();
         $item->delete();
 
+        // $this->emitCartUpdated(); // Removed
         return redirect()->back()->with('success', 'Producto eliminado del carrito');
     }
 
