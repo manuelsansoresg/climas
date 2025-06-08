@@ -27,9 +27,14 @@
                                 <tr>
                                     <th class="text-muted">Estado:</th>
                                     <td>
-                                        <span class="badge bg-{{ $sale->status === 'completed' ? 'success' : 'warning' }}">
+                                        <span class="badge bg-{{ $sale->status === 'completed' ? 'success' : ($sale->status === 'pending' ? 'warning' : 'secondary') }}">
                                             {{ ucfirst($sale->status) }}
                                         </span>
+                                        @if($sale->status === 'pending')
+                                            <div class="mt-2 text-warning">
+                                                <small>El pago está en proceso de verificación. Por favor, espere.</small>
+                                            </div>
+                                        @endif
                                     </td>
                                 </tr>
                                 <tr>
@@ -100,4 +105,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

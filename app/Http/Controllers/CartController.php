@@ -108,8 +108,12 @@ class CartController extends Controller
     }
 
     // Realizar la venta
-    public function checkout()
+    public function checkout(Request $request)
     {
+        $request->validate([
+            'file_transfer' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048'
+        ]);
+
         $cart = $this->getUserCart()->load('items.product');
 
         if ($cart->items->isEmpty()) {
@@ -127,10 +131,15 @@ class CartController extends Controller
         DB::beginTransaction();
 
         try {
+            // Procesar el archivo de comprobante
+            $file = $request->file('file_transfer');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/comprobante_pago'), $fileName);
+
             $subtotal = 0;
             $iva = 0;
             $total = 0;
-            $status = 'completed';
+            $status = 'pending';
             $payment_status = 'pending';
             $warehouse_id = 1;
             $payment_method = 'transfer';
@@ -159,6 +168,7 @@ class CartController extends Controller
                 'payment_method' => $payment_method,
                 'payment_status' => $payment_status,
                 'notes' => $notes,
+                'file_transfer' => $fileName,
             ]);
 
             foreach ($cart->items as $item) {

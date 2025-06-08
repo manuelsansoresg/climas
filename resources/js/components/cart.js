@@ -166,6 +166,26 @@ document.addEventListener('DOMContentLoaded', function() {
         checkoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const checkoutBtn = document.getElementById('checkout-btn');
+            const fileInput = document.getElementById('file_transfer');
+
+            // Validar archivo
+            if (!fileInput.files.length) {
+                alert('Por favor adjunta el comprobante de pago.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                alert('Por favor adjunta un archivo válido (JPG, PNG o PDF).');
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) { // 2MB
+                alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
+                return;
+            }
+
             checkoutBtn.disabled = true;
             checkoutBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Validando...';
 

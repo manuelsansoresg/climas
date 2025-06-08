@@ -19,6 +19,7 @@ class Sale extends Model
         'payment_method',
         'notes',
         'status',
+        'file_transfer',
         'payment_status',
         'folio',
     ];

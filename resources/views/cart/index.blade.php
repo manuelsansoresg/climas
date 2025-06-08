@@ -151,13 +151,56 @@
                                     </tr>
                                 @endforeach
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td>${{ number_format($cart->items->sum(function($item) { 
+                                        return $item->product->getPriceForUser() * $item->quantity; 
+                                    }), 2) }}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>IVA (16%):</strong></td>
+                                    <td>${{ number_format($cart->items->sum(function($item) { 
+                                        return $item->product->getPriceForUser() * $item->quantity * ($item->product->iva / 100); 
+                                    }), 2) }}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td>${{ number_format($cart->items->sum(function($item) { 
+                                        return $item->product->getPriceForUser() * $item->quantity * 1.16; 
+                                    }), 2) }}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
 
-                        <form id="cart-checkout-form" action="{{ route('cart.checkout') }}" method="POST" class="text-center">
-                            @csrf
-                            <button type="submit" class="btn btn-success" id="checkout-btn">Realizar compra</button>
-                        </form>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Información de Pago</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <h6>Datos para transferencia bancaria:</h6>
+                                    <p class="mb-1"><strong>Banco:</strong> BBVA</p>
+                                    <p class="mb-1"><strong>Cuenta:</strong> 1234 5678 9012 3456</p>
+                                    <p class="mb-1"><strong>CLABE:</strong> 012345678901234567</p>
+                                    <p class="mb-1"><strong>Titular:</strong> Empresa Demo S.A. de C.V.</p>
+                                </div>
+                                
+                                <form id="cart-checkout-form" action="{{ route('cart.checkout') }}" method="POST" class="text-center" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="file_transfer" class="form-label">Comprobante de Pago</label>
+                                        <input type="file" class="form-control" id="file_transfer" name="file_transfer" accept="image/*,.pdf" required>
+                                        <div class="form-text">Por favor adjunta el comprobante de tu transferencia bancaria.</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success" id="checkout-btn">Finalizar compra</button>
+                                </form>
+                            </div>
+                        </div>
                     @endif
                 </div>
             </div>
