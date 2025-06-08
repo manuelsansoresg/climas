@@ -73,19 +73,29 @@ class SaleController extends Controller
             
             $needsAuthorization = false;
             $authorizationKey = $request->input('admin_unlock_key');
+            $invalidProducts = [];
+            
             foreach ($request->products as $item) {
                 $product = Product::findOrFail($item['product_id']);
                 $realCost = $product->latestEntryCost();
                 $unitPrice = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
-                if (!$isAdmin && $realCost !== null && $unitPrice <= $realCost) {
+                
+                if ($realCost !== null && $unitPrice <= $realCost) {
+                    $invalidProducts[] = [
+                        'name' => $product->name,
+                        'real_cost' => $realCost,
+                        'unit_price' => $unitPrice
+                    ];
                     $needsAuthorization = true;
                 }
             }
+            
             if ($needsAuthorization) {
                 if (!$authorizationKey || !\App\Models\AdminUnlockKey::validateKey($authorizationKey)) {
                     return response()->json([
                         'success' => false,
                         'authorization_required' => true,
+                        'invalid_products' => $invalidProducts,
                         'message' => 'Se requiere autorización para vender por debajo del costo real. Clave incorrecta o no proporcionada.'
                     ], 422);
                 }

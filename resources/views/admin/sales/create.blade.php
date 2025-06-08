@@ -112,6 +112,9 @@
                                                         <!-- Productos agregados dinámicamente -->
                                                     </tbody>
                                                 </table>
+                                                <div id="price-validation-error" class="alert alert-danger mt-2" style="display: none;">
+                                                    El precio unitario debe ser mayor que el costo real del producto.
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

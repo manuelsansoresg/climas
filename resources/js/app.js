@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try { data = await response.json(); } catch { data = {}; }
                 if (!response.ok) {
                     if (data.authorization_required) {
-                        showAuthorizationLink();
+                        showAuthorizationLink(data.invalid_products);
                         return;
                     }
                     throw new Error(data.message || 'Error en la respuesta del servidor');
@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     window.location.href = data.redirect || '/admin/sales';
                 } else if (data.authorization_required) {
-                    showAuthorizationLink();
+                    showAuthorizationLink(data.invalid_products);
                 } else {
                     alert(data.message || 'Error al crear la venta');
                 }
@@ -578,14 +578,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Mostrar link y modal de autorización
-        function showAuthorizationLink() {
+        function showAuthorizationLink(invalidProducts) {
             if (document.getElementById('authorization-link')) return;
             // Mover el link arriba del botón Crear Venta
             const form = document.getElementById('saleForm');
             const submitRow = form.querySelector('.row.g-4.mt-2 .btn-success').parentElement;
             const authDiv = document.createElement('div');
             authDiv.className = 'mt-2';
-            authDiv.innerHTML = `Pedir autorización para venta bajo costo real<a href="#" id="authorization-link" class="ink-underline-primary"> Autorizar </a>`;
+            
+            // Crear mensaje con los productos inválidos
+            let invalidProductsHtml = '';
+            if (invalidProducts && invalidProducts.length > 0) {
+                invalidProductsHtml = '<div class="alert alert-warning mt-2">';
+                invalidProductsHtml += '<strong>Productos con precio inválido:</strong><ul>';
+                invalidProducts.forEach(product => {
+                    invalidProductsHtml += `<li>${product.name}: Precio actual ($${product.unit_price}) es menor o igual al costo real ($${product.real_cost})</li>`;
+                });
+                invalidProductsHtml += '</ul></div>';
+            }
+            
+            authDiv.innerHTML = `
+                ${invalidProductsHtml}
+                Pedir autorización para venta bajo costo real<a href="#" id="authorization-link" class="ink-underline-primary"> Autorizar </a>
+            `;
             submitRow.insertBefore(authDiv, submitRow.firstChild);
             document.getElementById('authorization-link').addEventListener('click', function(e) {
                 e.preventDefault();
