@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccessController;
 use App\Http\Controllers\Admin\ProductReportController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Auth::routes();
-
+Route::get('/contacto', [App\Http\Controllers\HomeController::class, 'contact'])->name('contact');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'home'])
     ->name('home')
     ->middleware(['auth', 'check.home.roles']);
@@ -107,4 +108,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mis-compras', [App\Http\Controllers\SaleController::class, 'index'])->name('sales.index');
+    Route::get('/mis-compras/{sale}', [App\Http\Controllers\SaleController::class, 'show'])->name('sales.show');
+});
+Route::post('/access', [AccessController::class, 'store'])->name('access.store');
 Route::get('/productos/{slug}', [HomeController::class, 'productDetail']);

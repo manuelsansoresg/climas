@@ -12,36 +12,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <!-- App Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/principal.css') }}" rel="stylesheet" />
     <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png" />
 
     @livewireStyles
 
-    <style>
-        @media (min-width: 992px) {
-            .navbar-nav.custom-animated-links .nav-link {
-                position: relative;
-                transition: color 0.3s ease;
-            }
-            .navbar-nav.custom-animated-links .nav-link::after {
-                content: '';
-                position: absolute;
-                width: 0;
-                height: 2px;
-                bottom: 0;
-                left: 0;
-                background-color: #0d6efd;
-                transition: width 0.3s ease;
-            }
-            .navbar-nav.custom-animated-links .nav-link:hover,
-            .navbar-nav.custom-animated-links .nav-link:focus {
-                color: #0d6efd;
-            }
-            .navbar-nav.custom-animated-links .nav-link:hover::after,
-            .navbar-nav.custom-animated-links .nav-link:focus::after {
-                width: 100%;
-            }
-        }
-    </style>
+   
 </head>
 <body class="d-flex flex-column min-vh-100" style="background-color: white;">
     <div id="app" class="flex-grow-1 d-flex flex-column">
@@ -81,7 +57,7 @@
                                     <i class="fas fa-user fa-lg me-2 text-primary"></i> {{ Auth::user()->name }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="#">Mis compras</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('sales.index') }}">Mis compras</a></li>
                                     <li><a class="dropdown-item" href="/cart">Carrito de compras</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
@@ -110,9 +86,16 @@
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
             </div>
             <div class="offcanvas-body">
-                <ul class="list-unstyled mb-3">
-                    <li><a href="/" class="text-decoration-none d-block py-2 fw-semibold">Inicio</a></li>
-                    <li><a href="/contacto" class="text-decoration-none d-block py-2 fw-semibold">Contacto</a></li>
+                @auth
+                    <div class="mb-3 d-flex align-items-center">
+                        <i class="fas fa-user fa-lg me-2 text-primary"></i>
+                        <span class="fw-semibold">{{ Auth::user()->name }}</span>
+                    </div>
+                @endauth
+
+                <ul class="list-unstyled">
+                    <li><a href="/" class="text-decoration-none d-block py-2">Inicio</a></li>
+                    <li><a href="/contacto" class="text-decoration-none d-block py-2">Contacto</a></li>
                 </ul>
 
                 @guest
@@ -120,12 +103,9 @@
                 @endguest
 
                 @auth
-                    <div class="mb-3 d-flex align-items-center">
-                        <i class="fas fa-user fa-lg me-2 text-primary"></i>
-                        <span class="fw-semibold">{{ Auth::user()->name }}</span>
-                    </div>
+                   <hr>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-decoration-none d-block py-2">Mis compras</a></li>
+                        <li><a href="/mis-compras" class="text-decoration-none d-block py-2">Mis compras</a></li>
                         <li><a href="/cart" class="text-decoration-none d-block py-2">Carrito de compras</a></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}" id="logoutFormMobile">

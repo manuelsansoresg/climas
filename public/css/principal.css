@@ -1,0 +1,47 @@
+.parallax-banner {
+  position: relative;
+  background-image: url("/images/contact.png");
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.parallax-banner h1 {
+  font-weight: 700;
+  font-size: 3rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+}
+
+@media (min-width: 992px) {
+  .navbar-nav.custom-animated-links .nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  .navbar-nav.custom-animated-links .nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #0d6efd;
+    transition: width 0.3s ease;
+  }
+  .navbar-nav.custom-animated-links .nav-link:hover,
+  .navbar-nav.custom-animated-links .nav-link:focus {
+    color: #0d6efd;
+  }
+  .navbar-nav.custom-animated-links .nav-link:hover::after,
+  .navbar-nav.custom-animated-links .nav-link:focus::after {
+    width: 100%;
+  }
+}

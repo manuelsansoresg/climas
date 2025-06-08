@@ -94,6 +94,7 @@
                     @if ($cart->items->isEmpty())
                         <p class="text-center">Tu carrito está vacío.</p>
                     @else
+                    <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -151,6 +152,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
 
                         <form id="cart-checkout-form" action="{{ route('cart.checkout') }}" method="POST" class="text-center">
                             @csrf
