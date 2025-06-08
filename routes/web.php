@@ -82,10 +82,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
 
     // Warehouse routes
 
-    //Route::get('/sale-report', \App\Http\Livewire\Admin\SaleReport::class)->name('sale-report');
+    Route::get('/sales/report', \App\Http\Livewire\Admin\SaleReport::class)->name('admin.sales.report');
 
     Route::resource('product-entries', \App\Http\Controllers\Admin\ProductEntryController::class);
     Route::resource('product-sales', \App\Http\Controllers\Admin\ProductSaleController::class);
+
+    Route::get('/sales/vendor-details/{userId}/{dateFrom?}/{dateTo?}', \App\Http\Livewire\Admin\VendorSalesDetails::class)
+        ->name('sales.vendor-details');
 });
 
 // API routes for product search

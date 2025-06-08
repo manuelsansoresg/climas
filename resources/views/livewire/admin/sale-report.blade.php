@@ -42,15 +42,21 @@
                                             <th>Monto de venta</th>
                                             <th>Costo Real</th>
                                             <th>Ganancias</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($report as $row)
                                             <tr>
-                                                <td>{{ $row['vendedor'] }}</td>
+                                                <td><a href="{{ route('admin.sales.vendor-details', [
+                                                    'userId' => $row['user_id'],
+                                                    'dateFrom' => $filters['date_from'] ?? null,
+                                                    'dateTo' => $filters['date_to'] ?? null
+                                                ]) }}">{{ $row['vendedor'] }}</a></td>
                                                 <td>${{ number_format($row['monto_venta'], 2) }}</td>
                                                 <td>${{ number_format($row['costo_real'], 2) }}</td>
                                                 <td>${{ number_format($row['ganancia'], 2) }}</td>
+                                                <td><a href="/admin/sales/{{ $row['id'] }}"><i class="fa fa-eye"></i></a></td>
                                             </tr>
                                         @empty
                                             <tr>

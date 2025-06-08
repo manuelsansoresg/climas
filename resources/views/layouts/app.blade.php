@@ -1,50 +1,100 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{{ config('app.name', 'BackTI Climas') }}</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- FontAwesome 5 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <!-- App Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <!-- App JS -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-    <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
+    <link rel="icon" href="{{ asset('images/favicon.png') }}" type="image/png" />
 
-    <!-- Livewire Styles -->
     @livewireStyles
+
+    <style>
+        @media (min-width: 992px) {
+            .navbar-nav.custom-animated-links .nav-link {
+                position: relative;
+                transition: color 0.3s ease;
+            }
+            .navbar-nav.custom-animated-links .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: 0;
+                left: 0;
+                background-color: #0d6efd;
+                transition: width 0.3s ease;
+            }
+            .navbar-nav.custom-animated-links .nav-link:hover,
+            .navbar-nav.custom-animated-links .nav-link:focus {
+                color: #0d6efd;
+            }
+            .navbar-nav.custom-animated-links .nav-link:hover::after,
+            .navbar-nav.custom-animated-links .nav-link:focus::after {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-<body style="background-color: white;" class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" style="background-color: white;">
     <div id="app" class="flex-grow-1 d-flex flex-column">
         <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 shadow-sm">
             <div class="container-fluid">
-                <button class="btn text-primary me-2 d-lg-none" id="sidebarToggle"><i class="fas fa-bars fa-lg"></i></button>
+                <!-- Botón hamburguesa para móvil -->
+                <button class="btn text-primary me-2 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+
                 <a class="navbar-brand d-flex align-items-center" href="/">
-                    <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="me-2">
+                    <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="me-2" />
                 </a>
-                <div class="d-flex align-items-center ms-auto">
+
+                <!-- Enlaces visibles en escritorio centrados con animación -->
+                <div class="collapse navbar-collapse d-none d-lg-flex justify-content-center">
+                    <ul class="navbar-nav mb-2 mb-lg-0 custom-animated-links">
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold" href="/">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold" href="/contacto">Contacto</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Zona derecha escritorio -->
+                <div class="d-none d-lg-flex align-items-center ms-auto">
                     @guest
-                        <a href="/login" class="btn text-primary me-2"><i class="fas fa-user fa-lg"></i></a>
+                        <a href="/login" class="btn btn-outline-primary me-3">Iniciar Sesión</a>
                     @endguest
 
                     @auth
-                        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn text-primary me-2">
-                                <i class="fas fa-sign-out-alt fa-lg"></i> Salir
-                            </button>
-                        </form>
+                        <ul class="navbar-nav align-items-center me-3">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-semibold d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                                    <i class="fas fa-user fa-lg me-2 text-primary"></i> {{ Auth::user()->name }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="#">Mis compras</a></li>
+                                    <li><a class="dropdown-item" href="/cart">Carrito de compras</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">Salir</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     @endauth
+
                     <a href="/cart" class="btn text-primary position-relative">
                         <i class="fas fa-shopping-bag fa-lg"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
@@ -53,14 +103,38 @@
             </div>
         </nav>
 
-        <!-- Search Overlay -->
-        <div id="searchOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background:rgba(255,255,255,0.95);z-index:1050;">
-            <div class="d-flex justify-content-center align-items-start pt-5">
-                <div class="search-box bg-white rounded-pill shadow p-2 d-flex align-items-center" style="width:90vw;max-width:500px;">
-                    <input type="text" class="form-control border-0 bg-transparent" placeholder="Búsqueda" style="font-size:1.2rem;">
-                    <button class="btn text-primary"><i class="fas fa-search"></i></button>
-                    <button class="btn text-secondary ms-2" id="closeSearch"><i class="fas fa-times fa-lg"></i></button>
-                </div>
+        <!-- Offcanvas menú móvil -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="list-unstyled mb-3">
+                    <li><a href="/" class="text-decoration-none d-block py-2 fw-semibold">Inicio</a></li>
+                    <li><a href="/contacto" class="text-decoration-none d-block py-2 fw-semibold">Contacto</a></li>
+                </ul>
+
+                @guest
+                    <a href="/login" class="btn btn-primary w-100 mb-3">Iniciar Sesión</a>
+                @endguest
+
+                @auth
+                    <div class="mb-3 d-flex align-items-center">
+                        <i class="fas fa-user fa-lg me-2 text-primary"></i>
+                        <span class="fw-semibold">{{ Auth::user()->name }}</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none d-block py-2">Mis compras</a></li>
+                        <li><a href="/cart" class="text-decoration-none d-block py-2">Carrito de compras</a></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" id="logoutFormMobile">
+                                @csrf
+                                <button type="submit" class="btn btn-link p-0 text-danger">Salir</button>
+                            </form>
+                        </li>
+                    </ul>
+                @endauth
             </div>
         </div>
 
@@ -74,7 +148,7 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-lg-4 mb-4 mb-lg-0">
-                    <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="mb-3">
+                    <img src="/images/backti_logo.png" alt="BackTI Climas" height="60" class="mb-3" />
                     <p class="text-secondary">Soluciones integrales en climatización y ventilación para hogares y empresas.</p>
                 </div>
                 <div class="col-lg-2 mb-4 mb-lg-0">
@@ -118,12 +192,13 @@
         </div>
     </footer>
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Bootstrap Bundle JS (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- FontAwesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <!-- Tu JS personalizado -->
     <script src="{{ asset('js/principal.js') }}"></script>
 
-    <!-- Livewire Scripts -->
     @livewireScripts
 </body>
 </html>

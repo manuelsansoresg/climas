@@ -50,15 +50,18 @@ class SaleReport extends Component
             ->when($userId, fn($q) => $q->where('user_id', $userId))
             ->with(['user', 'details'])
             ->orderBy('created_at', 'desc');
-
         $sales = $salesQuery->get();
+        //dd($sales);
 
         $report = [];
         foreach ($sales as $sale) {
+            $saleId = $sale->id;
             $vendedorId = $sale->user_id;
-            $vendedorNombre = $sale->user->name ?? 'Sin usuario';
+            $vendedorNombre = $sale->user->name.' '.$sale->user->last_name ?? 'Sin usuario';
             if (!isset($report[$vendedorId])) {
                 $report[$vendedorId] = [
+                    'id' => $saleId,
+                    'user_id' => $vendedorId,
                     'vendedor' => $vendedorNombre,
                     'monto_venta' => 0,
                     'costo_real' => 0,
@@ -68,48 +71,16 @@ class SaleReport extends Component
             foreach ($sale->details as $detail) {
                 $monto_venta = $detail->price * $detail->quantity;
                 
-                // Obtener todas las entradas del producto ordenadas por fecha ascendente
-                $entradas = ProductEntry::where('product_id', $detail->product_id)
-                    ->orderBy('entry_date', 'asc')
-                    ->get();
+                // Obtener la entrada más reciente del producto
+                $entradaReciente = ProductEntry::where('product_id', $detail->product_id)
+                    ->orderBy('entry_date', 'desc')
+                    ->first();
 
-                // Obtener todas las ventas anteriores a esta venta
-                $ventasAnteriores = ProductSale::where('product_id', $detail->product_id)
-                    ->where('sale_date', '<', $sale->created_at)
-                    ->orderBy('sale_date', 'asc')
-                    ->get();
-
-                // Calcular el stock disponible hasta el momento de la venta
-                $stockDisponible = [];
-                foreach ($entradas as $entrada) {
-                    $cantidadDisponible = $entrada->quantity;
-                    // Restar las ventas anteriores que afectan a esta entrada
-                    foreach ($ventasAnteriores as $ventaAnterior) {
-                        if ($cantidadDisponible > 0) {
-                            $cantidadAReducir = min($cantidadDisponible, $ventaAnterior->quantity);
-                            $cantidadDisponible -= $cantidadAReducir;
-                        }
-                    }
-                    if ($cantidadDisponible > 0) {
-                        $stockDisponible[] = [
-                            'cantidad' => $cantidadDisponible,
-                            'costo' => $entrada->cost_price
-                        ];
-                    }
-                }
-
-                // Calcular el costo real usando FIFO
-                $cantidadRestante = $detail->quantity;
-                $costoReal = 0;
-                foreach ($stockDisponible as $stock) {
-                    if ($cantidadRestante <= 0) break;
-                    
-                    $cantidadAUsar = min($cantidadRestante, $stock['cantidad']);
-                    $costoReal += $cantidadAUsar * $stock['costo'];
-                    $cantidadRestante -= $cantidadAUsar;
-                }
+                // Calcular el costo real usando el costo más reciente
+                $costoReal = $entradaReciente ? $entradaReciente->cost_price * $detail->quantity : 0;
 
                 $ganancia = $monto_venta - $costoReal;
+                //$report[$vendedorId]['id'] += $saleId;
                 $report[$vendedorId]['monto_venta'] += $monto_venta;
                 $report[$vendedorId]['costo_real'] += $costoReal;
                 $report[$vendedorId]['ganancia'] += $ganancia;

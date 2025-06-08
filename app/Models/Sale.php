@@ -37,7 +37,7 @@ class Sale extends Model
     {
         do {
             // Genera un folio, por ejemplo: "FOLIO-20250607-XXXX" donde XXXX es un número aleatorio
-            $folio = 'FOLIO-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+            $folio = 'CLI-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
         } while (self::where('folio', $folio)->exists());
 
         return $folio;
