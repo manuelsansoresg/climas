@@ -27,87 +27,68 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        btn.addEventListener('click', function() {
-            const productId = btn.getAttribute('data-product-id');
-            const url = btn.getAttribute('data-url');
-            const csrfToken = btn.getAttribute('data-csrf');
-            const quantity = parseInt(quantityInput?.value || '1');
+        // Nueva función para agregar al carrito con axios y emitir Livewire solo si es exitoso
+        window.addToCart = function(button) {
+            const productId = button.getAttribute('data-product-id');
+            const url = button.getAttribute('data-url');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Agregando...';
 
             // Validar stock en backend antes de agregar
-            fetch(`/api/product/${productId}/stock`)
-                .then(res => res.json())
-                .then(stockData => {
-                    availableStock = parseInt(stockData.stock);
-                    btn.setAttribute('data-stock', availableStock);
+            axios.get(`/api/product/${productId}/stock`)
+                .then(res => {
+                    availableStock = parseInt(res.data.stock);
+                    button.setAttribute('data-stock', availableStock);
                     if (stockDisplay) {
                         stockDisplay.textContent = `Stock disponible: ${availableStock}`;
                     }
-                    quantityInput.max = availableStock;
                     if (quantity > availableStock) {
                         alert(`Error: Solo hay ${availableStock} unidades disponibles`);
-                        quantityInput.value = availableStock > 0 ? availableStock : 1;
-                        return;
+                        if (quantityInput) quantityInput.value = availableStock > 0 ? availableStock : 1;
+                        button.disabled = false;
+                        button.innerHTML = 'Agregar al carrito';
+                        return Promise.reject();
                     }
-
-                    // Mostrar indicador de carga
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Agregando...';
-
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({ product_id: productId, quantity: quantity })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => Promise.reject(err));
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Restaurar el botón
-                        btn.disabled = false;
-                        btn.innerHTML = 'Agregar al carrito';
-
-                        // Mostrar mensaje de éxito o advertencia
-                        const alertDiv = document.createElement('div');
-                        if (data.message && data.message.includes('ya fue agregado')) {
-                            alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+                    // Si hay stock, agregar al carrito
+                    return axios.post(url, {
+                        product_id: productId,
+                        quantity: quantity
+                    });
+                })
+                .then(response => {
+                    button.disabled = false;
+                    button.innerHTML = 'Agregar al carrito';
+                    // Mostrar mensaje de éxito
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        ${response.data.message || 'Producto agregado al carrito'}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    const container = document.querySelector('.container');
+                    const card = document.querySelector('.card');
+                    if (container) {
+                        if (card && card.parentNode === container) {
+                            container.insertBefore(alertDiv, card);
                         } else {
-                            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                            container.insertBefore(alertDiv, container.firstChild);
                         }
-                        alertDiv.innerHTML = `
-                            ${data.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        `;
-                        const container = document.querySelector('.container');
-                        const card = document.querySelector('.card');
-                        if (container) {
-                            if (card && card.parentNode === container) {
-                                container.insertBefore(alertDiv, card);
-                            } else {
-                                container.insertBefore(alertDiv, container.firstChild);
-                            }
-                        }
-
-                        // Redirigir si es necesario
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        }
-                    })
-                    .catch(error => {
-                        // Restaurar el botón
-                        btn.disabled = false;
-                        btn.innerHTML = 'Agregar al carrito';
-
-                        // Mostrar mensaje de error
+                    }
+                    // Emitir evento Livewire solo si fue exitoso
+                    if (window.Livewire) {
+                        window.Livewire.emit('cartUpdated');
+                    }
+                })
+                .catch(error => {
+                    button.disabled = false;
+                    button.innerHTML = 'Agregar al carrito';
+                    if (error && error.response && error.response.data && error.response.data.message) {
                         const alertDiv = document.createElement('div');
                         alertDiv.className = 'alert alert-danger alert-dismissible fade show';
                         alertDiv.innerHTML = `
-                            ${error.message || 'Error al agregar al carrito'}
+                            ${error.response.data.message}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         `;
                         const container = document.querySelector('.container');
@@ -119,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 container.insertBefore(alertDiv, container.firstChild);
                             }
                         }
-                    });
+                    }
                 });
-        });
+        };
     }
 
     // Funcionalidad para validar cantidad en el carrito
