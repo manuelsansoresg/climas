@@ -170,7 +170,7 @@ class CartController extends Controller
                     'subtotal' => $itemSubtotal,
                     'iva' => $itemIva,
                     'total' => $itemTotal,
-                    'price_type' => SaleDetail::getUserRole(),
+                    'price_type' => Sale::getUserRole(),
                 ]);
             }
 

@@ -12,16 +12,36 @@ class Sale extends Model
     protected $fillable = [
         'user_id',
         'client_id',
-        'total',
+        'warehouse_id',
         'subtotal',
         'iva',
-        'status',
-        'folio',
-        'warehouse_id',
+        'total',
         'payment_method',
-        'payment_status',
         'notes',
+        'status',
+        'payment_status',
+        'folio',
     ];
+
+    public static function getUserRole()
+    {
+        $user = auth()->user();
+        if (!$user || !($user instanceof \App\Models\User)) return 'publico';
+        if ($user->hasRole('Cliente mayorista')) return 'mayorista';
+        if ($user->hasRole('Cliente instalador')) return 'instalador';
+        return 'publico';
+    }
+
+
+    public static function generateUniqueFolio()
+    {
+        do {
+            // Genera un folio, por ejemplo: "FOLIO-20250607-XXXX" donde XXXX es un número aleatorio
+            $folio = 'FOLIO-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+        } while (self::where('folio', $folio)->exists());
+
+        return $folio;
+    }
 
     public function user()
     {
@@ -36,5 +56,10 @@ class Sale extends Model
     public function details()
     {
         return $this->hasMany(SaleDetail::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 } 

@@ -72,10 +72,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
     Route::resource('sales', \App\Http\Controllers\Admin\SaleController::class);
 
     // Sales routes
-    Route::get('sales', [App\Http\Controllers\Admin\SaleController::class, 'index'])->name('sales.index');
-    Route::get('sales/create', [App\Http\Controllers\Admin\SaleController::class, 'create'])->name('sales.create');
-    Route::post('sales', [App\Http\Controllers\Admin\SaleController::class, 'store'])->name('sales.store');
-    Route::get('sales/{sale}', [App\Http\Controllers\Admin\SaleController::class, 'show'])->name('sales.show');
+   
     Route::get('sales/reports/list', [App\Http\Controllers\Admin\SaleController::class, 'reports'])->name('sales.reports');
 
     // Reportes personalizados

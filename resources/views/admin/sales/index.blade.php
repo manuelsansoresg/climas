@@ -41,6 +41,7 @@
                                                 <td>${{ number_format($sale->total, 2) }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.sales.show', $sale) }}" class="btn btn-sm btn-info">Ver</a>
+                                                    <a href="{{ route('admin.sales.edit', $sale) }}" class="btn btn-sm btn-primary">Editar</a>
                                                 </td>
                                             </tr>
                                         @empty

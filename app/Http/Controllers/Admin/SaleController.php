@@ -139,11 +139,8 @@ class SaleController extends Controller
                     'subtotal' => $itemSubtotal,
                     'iva' => $itemIva,
                     'total' => $itemSubtotal + $itemIva,
-                    'price_type' => $this->getUserRole()
+                    'price_type' => Sale::getUserRole()
                 ]);
-
-                // Update product stock
-                $product->decrement('stock', $item['quantity']);
 
                 if ($request->status == 2) { //pagado
                     // Crear salida en inventario
@@ -181,6 +178,182 @@ class SaleController extends Controller
         return view('admin.sales.show', compact('sale'));
     }
 
+    public function edit(Sale $sale)
+    {
+        $warehouses = Warehouse::all();
+        $clients = User::role(['Cliente publico en general', 'Cliente mayorista', 'Cliente instalador'])->get();
+        
+        // Cargar las relaciones necesarias
+        $sale->load(['client', 'details.product', 'warehouse']);
+        
+        // Preparar los datos de los productos para el JavaScript
+        $saleDetails = $sale->details->map(function($detail) {
+            $product = $detail->product;
+            $stockDisponible = $product->stock() + $detail->quantity;
+            return [
+                'id' => $detail->product_id,
+                'name' => $product->name,
+                'stock' => $stockDisponible,
+                'price' => $detail->price,
+                'quantity' => $detail->quantity,
+                'real_cost' => $product->latestEntryCost()
+            ];
+        });
+        
+        return view('admin.sales.edit', compact('sale', 'clients', 'warehouses', 'saleDetails'));
+    }
+
+    public function update(Request $request, Sale $sale)
+    {
+        $request->validate([
+            'client_id' => 'required|exists:users,id',
+            'products' => 'required|array',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'payment_method' => 'required|in:cash,credit_card,transfer',
+            'notes' => 'nullable|string'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $subtotal = 0;
+            $iva = 0;
+            $total = 0;
+            
+            // Agrupar cantidades por producto
+            $productQuantities = [];
+            foreach ($request->products as $item) {
+                if (!isset($productQuantities[$item['product_id']])) {
+                    $productQuantities[$item['product_id']] = 0;
+                }
+                $productQuantities[$item['product_id']] += $item['quantity'];
+            }
+
+            // Validar stock por producto
+            foreach ($productQuantities as $productId => $totalQuantity) {
+                $product = Product::findOrFail($productId);
+                // Sumar el stock actual de la venta para este producto
+                $currentSaleQuantity = $sale->details()
+                    ->where('product_id', $productId)
+                    ->sum('quantity');
+                // Restar la cantidad actual de la venta del stock total
+                $availableStock = $product->stock() + $currentSaleQuantity;
+                
+                if ($availableStock < $totalQuantity) {
+                    throw new \Exception("Stock insuficiente para el producto: {$product->name}");
+                }
+            }
+
+            // Validar precio unitario vs costo real
+            $user = auth()->user();
+            $isAdmin = false;
+            if ($user && method_exists($user, 'hasAnyRole')) {
+                $isAdmin = $user->hasAnyRole(['Admin']);
+            }
+            
+            $needsAuthorization = false;
+            $authorizationKey = $request->input('admin_unlock_key');
+            $invalidProducts = [];
+            
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $realCost = $product->latestEntryCost();
+                $unitPrice = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
+                
+                if ($realCost !== null && $unitPrice <= $realCost) {
+                    $invalidProducts[] = [
+                        'name' => $product->name,
+                        'real_cost' => $realCost,
+                        'unit_price' => $unitPrice
+                    ];
+                    $needsAuthorization = true;
+                }
+            }
+            
+            if ($needsAuthorization) {
+                if (!$authorizationKey || !\App\Models\AdminUnlockKey::validateKey($authorizationKey)) {
+                    return response()->json([
+                        'success' => false,
+                        'authorization_required' => true,
+                        'invalid_products' => $invalidProducts,
+                        'message' => 'Se requiere autorización para vender por debajo del costo real. Clave incorrecta o no proporcionada.'
+                    ], 422);
+                }
+            }
+
+            // Calcular totales
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $price = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
+                $itemSubtotal = $price * $item['quantity'];
+                $itemIva = $itemSubtotal * ($product->iva / 100);
+                $subtotal += $itemSubtotal;
+                $iva += $itemIva;
+            }
+            $total = $subtotal + $iva;
+            
+            // Actualizar venta
+            $sale->update([
+                'client_id' => $request->client_id,
+                'subtotal' => $subtotal,
+                'iva' => $iva,
+                'total' => $total,
+                'payment_method' => $request->payment_method,
+                'notes' => $request->notes,
+                'status' => $request->status
+            ]);
+
+            // Eliminar detalles actuales
+            $sale->details()->delete();
+
+            // Crear nuevos detalles
+            foreach ($request->products as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $price = isset($item['price']) ? $item['price'] : $this->getPriceByUserRole($product, $request->client_id);
+                $itemSubtotal = $price * $item['quantity'];
+                $itemIva = $itemSubtotal * ($product->iva / 100);
+
+                SaleDetail::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $price,
+                    'subtotal' => $itemSubtotal,
+                    'iva' => $itemIva,
+                    'total' => $itemSubtotal + $itemIva,
+                    'price_type' => Sale::getUserRole()
+                ]);
+
+                if ($request->status == 2) { //pagado
+                    // Crear salida en inventario
+                    ProductSale::create([
+                        'product_id' => $item['product_id'],
+                        'warehouse_id' => $request->warehouse_id,
+                        'quantity' => $item['quantity'],
+                        'sale_price' => $price,
+                        'sale_date' => now(),
+                    ]);
+                }
+            }
+           
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Venta actualizada exitosamente',
+                'redirect' => route('admin.sales.index')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la venta: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
     public function reports()
     {
         $sales = Sale::with(['client', 'user', 'details.product'])
@@ -209,12 +382,5 @@ class SaleController extends Controller
         return $product->precio_publico;
     }
 
-    private function getUserRole()
-    {
-        $user = auth()->user();
-        if (!$user || !($user instanceof \App\Models\User)) return 'publico';
-        if ($user->hasRole('Cliente mayorista')) return 'mayorista';
-        if ($user->hasRole('Cliente instalador')) return 'instalador';
-        return 'publico';
-    }
+   
 }

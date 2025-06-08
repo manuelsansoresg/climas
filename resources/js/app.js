@@ -349,48 +349,74 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- CLIENTE: BUSQUEDA AJAX CON SELECT2 EN VENTAS ---
-    if (document.getElementById('client-search')) {
-        $('#client-search').select2({
-            placeholder: 'Buscar cliente por nombre, email o RFC',
-            ajax: {
-                url: '/api/clients/search',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return { q: params.term };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(function (client) {
-                            return {
-                                id: client.id,
-                                text: (client.name || '') + ' ' + (client.last_name || ''),
-                                role: client.role || 'Cliente publico en general'
-                            };
-                        })
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 1,
-            width: '100%',
-            templateResult: function (data) {
-                return data.text;
-            },
-            escapeMarkup: function (markup) { return markup; }
-        });
-
-        // Guardar el cliente seleccionado y actualizar precios
-        $('#client-search').on('select2:select', function (e) {
-            const data = e.params.data;
-            clienteSeleccionado = data;
-            actualizarPreciosPorRol();
-        });
+    // Función reutilizable para pedir cantidad
+    function pedirCantidad(stock) {
+        let cantidad = prompt('Cantidad:', '1');
+        if (!cantidad || isNaN(cantidad) || cantidad < 1) {
+            alert('Cantidad inválida');
+            return null;
+        }
+        cantidad = parseInt(cantidad);
+        if (cantidad > stock) {
+            alert('La cantidad no puede ser mayor al stock disponible (' + stock + ')');
+            return null;
+        }
+        return cantidad;
     }
 
-    // --- MÓDULO DE VENTAS: AGREGAR PRODUCTOS CON SELECT2 Y TABLA ---
-    if (document.getElementById('product-search')) {
+    // --- MÓDULO DE VENTAS: CREAR ---
+    if (!window.saleData && document.getElementById('saleForm')) {
+        let clienteSeleccionadoCrear = { role: 'Cliente publico en general' };
+        let lastProductResultsCrear = {};
+        let productsAddedCrear = [];
+
+        function obtenerPrecioPorRolCrear(producto, role) {
+            if (role === 'Cliente mayorista') {
+                return producto.precio_mayorista;
+            } else if (role === 'Cliente instalador') {
+                return producto.precio_instalador;
+            } else {
+                return producto.precio_publico;
+            }
+        }
+
+        if (document.getElementById('client-search')) {
+            $('#client-search').select2({
+                placeholder: 'Buscar cliente por nombre, email o RFC',
+                ajax: {
+                    url: '/api/clients/search',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(function (client) {
+                                return {
+                                    id: client.id,
+                                    text: (client.name || '') + ' ' + (client.last_name || ''),
+                                    role: client.role || 'Cliente publico en general'
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                width: '100%',
+                templateResult: function (data) {
+                    return data.text;
+                },
+                escapeMarkup: function (markup) { return markup; }
+            });
+
+            $('#client-search').on('select2:select', function (e) {
+                const data = e.params.data;
+                clienteSeleccionadoCrear = data;
+            });
+        }
+
         $('#product-search').select2({
             placeholder: 'Buscar producto por nombre',
             ajax: {
@@ -401,19 +427,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     return { q: params.term };
                 },
                 processResults: function (data) {
-                    lastProductResults = {};
+                    lastProductResultsCrear = {};
                     data.forEach(function(product) {
-                        lastProductResults[product.id] = product;
+                        lastProductResultsCrear[product.id] = product;
                     });
                     return {
                         results: data.map(function (product) {
                             return {
                                 id: product.id,
+                                name: product.name,
                                 text: product.name,
                                 stock: product.stock,
                                 precio_publico: product.precio_publico,
                                 precio_mayorista: product.precio_mayorista,
-                                precio_distribuidor: product.precio_distribuidor
+                                precio_instalador: product.precio_instalador,
+                                real_cost: product.real_cost
                             };
                         })
                     };
@@ -439,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('add-product').addEventListener('click', function () {
             const select2Data = $('#product-search').select2('data')[0];
-            const product = lastProductResults[select2Data?.id];
+            const product = lastProductResultsCrear[select2Data?.id];
             if (!select2Data) {
                 alert('Seleccione un producto');
                 return;
@@ -448,23 +476,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('No se pudo obtener el stock o precio del producto.');
                 return;
             }
-            if (productsAdded.find(p => p.id == product.id)) {
+            if (productsAddedCrear.find(p => p.id == product.id)) {
                 alert('Este producto ya fue agregado');
                 return;
             }
-            let cantidad = prompt('Cantidad:', '1');
-            if (!cantidad || isNaN(cantidad) || cantidad < 1) {
-                alert('Cantidad inválida');
-                return;
-            }
-            cantidad = parseInt(cantidad);
-            if (cantidad > product.stock) {
-                alert('La cantidad no puede ser mayor al stock disponible (' + product.stock + ')');
-                return;
-            }
-            // Selecciona el precio según el rol del cliente
-            const precioUnitario = obtenerPrecioPorRol(product, clienteSeleccionado.role);
-            productsAdded.push({
+            let cantidad = pedirCantidad(product.stock);
+            if (!cantidad) return;
+            const precioUnitario = obtenerPrecioPorRolCrear(product, clienteSeleccionadoCrear.role);
+            productsAddedCrear.push({
                 id: product.id,
                 name: product.name,
                 stock: product.stock,
@@ -472,14 +491,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 quantity: cantidad,
                 real_cost: product.real_cost
             });
-            renderProductsTable();
+            renderProductsTableCrear();
             $('#product-search').val(null).trigger('change');
         });
 
-        function renderProductsTable() {
+        function renderProductsTableCrear() {
             const tbody = document.querySelector('#products-table tbody');
             tbody.innerHTML = '';
-            productsAdded.forEach((product, idx) => {
+            productsAddedCrear.forEach((product, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
@@ -501,8 +520,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('#products-table').addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-product')) {
                 const idx = e.target.getAttribute('data-idx');
-                productsAdded.splice(idx, 1);
-                renderProductsTable();
+                productsAddedCrear.splice(idx, 1);
+                renderProductsTableCrear();
             }
         });
 
@@ -511,34 +530,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 const idx = e.target.getAttribute('data-idx');
                 let value = parseInt(e.target.value);
                 if (isNaN(value) || value < 1) value = 1;
-                if (value > productsAdded[idx].stock) value = productsAdded[idx].stock;
-                productsAdded[idx].quantity = value;
+                if (value > productsAddedCrear[idx].stock) value = productsAddedCrear[idx].stock;
+                productsAddedCrear[idx].quantity = value;
                 e.target.value = value;
             }
         });
 
         document.getElementById('saleForm').addEventListener('submit', function (e) {
             e.preventDefault();
-
-            // Sincronizar precios editados
             document.querySelectorAll('.price-input').forEach(function(input) {
                 const idx = input.getAttribute('data-idx');
-                if (productsAdded[idx]) {
-                    productsAdded[idx].price = parseFloat(input.value);
+                if (productsAddedCrear[idx]) {
+                    productsAddedCrear[idx].price = parseFloat(input.value);
                 }
             });
-
-            if (productsAdded.length === 0) {
+            if (productsAddedCrear.length === 0) {
                 alert('Debe agregar al menos un producto a la venta');
                 return;
             }
             const formData = new FormData(this);
-            productsAdded.forEach((product, idx) => {
+            productsAddedCrear.forEach((product, idx) => {
                 formData.append(`products[${idx}][product_id]`, product.id);
                 formData.append(`products[${idx}][quantity]`, product.quantity);
                 formData.append(`products[${idx}][price]`, product.price);
             });
-            // Si ya se ingresó clave de autorización, agregarla
             if (window.adminUnlockKey) {
                 formData.append('admin_unlock_key', window.adminUnlockKey);
             }
@@ -554,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try { data = await response.json(); } catch { data = {}; }
                 if (!response.ok) {
                     if (data.authorization_required) {
-                        showAuthorizationLink(data.invalid_products);
+                        showAuthorizationLinkCrear(data.invalid_products);
                         return;
                     }
                     throw new Error(data.message || 'Error en la respuesta del servidor');
@@ -566,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     window.location.href = data.redirect || '/admin/sales';
                 } else if (data.authorization_required) {
-                    showAuthorizationLink(data.invalid_products);
+                    showAuthorizationLinkCrear(data.invalid_products);
                 } else {
                     alert(data.message || 'Error al crear la venta');
                 }
@@ -577,16 +592,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Mostrar link y modal de autorización
-        function showAuthorizationLink(invalidProducts) {
+        function showAuthorizationLinkCrear(invalidProducts) {
             if (document.getElementById('authorization-link')) return;
-            // Mover el link arriba del botón Crear Venta
             const form = document.getElementById('saleForm');
             const submitRow = form.querySelector('.row.g-4.mt-2 .btn-success').parentElement;
             const authDiv = document.createElement('div');
             authDiv.className = 'mt-2';
-            
-            // Crear mensaje con los productos inválidos
             let invalidProductsHtml = '';
             if (invalidProducts && invalidProducts.length > 0) {
                 invalidProductsHtml = '<div class="alert alert-warning mt-2">';
@@ -596,7 +607,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 invalidProductsHtml += '</ul></div>';
             }
-            
             authDiv.innerHTML = `
                 ${invalidProductsHtml}
                 Pedir autorización para venta bajo costo real<a href="#" id="authorization-link" class="ink-underline-primary"> Autorizar </a>
@@ -667,6 +677,228 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('admin-unlock-error').style.display = 'block';
                 });
             };
+        }
+    }
+
+    // --- MÓDULO DE VENTAS: EDICIÓN ---
+    if (window.saleData && document.getElementById('saleForm')) {
+        let clienteSeleccionadoEditar = { role: window.saleData.clientRole };
+        let productsAddedEditar = [];
+        function obtenerPrecioPorRolEditar(producto, role) {
+            if (role === 'Cliente mayorista') {
+                return producto.precio_mayorista;
+            } else if (role === 'Cliente instalador') {
+                return producto.precio_instalador;
+            } else {
+                return producto.precio_publico;
+            }
+        }
+        if (window.saleData.existingProducts && window.saleData.existingProducts.length > 0) {
+            productsAddedEditar = [...window.saleData.existingProducts];
+            renderProductsTableEditar();
+        }
+        $('#client-search').select2({
+            placeholder: 'Buscar cliente por nombre, email o RFC',
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (client) {
+                            return {
+                                id: client.id,
+                                text: (client.name || '') + ' ' + (client.last_name || ''),
+                                role: client.role || 'Cliente publico en general'
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        $('#product-search').select2({
+            placeholder: 'Buscar producto por nombre',
+            ajax: {
+                url: '/api/products/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (product) {
+                            return {
+                                id: product.id,
+                                name: product.name,
+                                text: product.name,
+                                stock: product.stock,
+                                precio_publico: product.precio_publico,
+                                precio_mayorista: product.precio_mayorista,
+                                precio_instalador: product.precio_instalador,
+                                real_cost: product.real_cost
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+            width: '100%'
+        });
+        document.getElementById('add-product').addEventListener('click', function() {
+            const select2Data = $('#product-search').select2('data')[0];
+            if (!select2Data) {
+                alert('Seleccione un producto');
+                return;
+            }
+            let cantidad = pedirCantidad(select2Data.stock);
+            if (!cantidad) return;
+            const product = {
+                id: select2Data.id,
+                name: select2Data.name || select2Data.text,
+                stock: select2Data.stock,
+                price: obtenerPrecioPorRolEditar(select2Data, clienteSeleccionadoEditar.role),
+                quantity: cantidad,
+                real_cost: select2Data.real_cost !== undefined ? select2Data.real_cost : (select2Data.realCost !== undefined ? select2Data.realCost : 0)
+            };
+            if (productsAddedEditar.find(p => p.id == product.id)) {
+                alert('Este producto ya fue agregado');
+                return;
+            }
+            productsAddedEditar.push(product);
+            renderProductsTableEditar();
+            $('#product-search').val(null).trigger('change');
+        });
+        function renderProductsTableEditar() {
+            const tbody = document.querySelector('#products-table tbody');
+            tbody.innerHTML = '';
+            productsAddedEditar.forEach((product, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <input type="hidden" name="products[${idx}][product_id]" value="${product.id}">
+                        ${product.name}
+                    </td>
+                    <td>
+                        <input type="number" name="products[${idx}][quantity]" value="${product.quantity}" min="1" max="${product.stock}" class="form-control form-control-sm quantity-input" data-idx="${idx}">
+                    </td>
+                    <td>${product.stock}</td>
+                    <td>${typeof product.real_cost !== 'undefined' && product.real_cost !== null ? '$' + parseFloat(product.real_cost).toFixed(2) : '-'}</td>
+                    <td><input type="number" name="products[${idx}][price]" value="${product.price}" min="0" step="0.01" class="form-control form-control-sm price-input" data-idx="${idx}"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-product" data-idx="${idx}">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        document.querySelector('#products-table').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-product')) {
+                const idx = e.target.getAttribute('data-idx');
+                productsAddedEditar.splice(idx, 1);
+                renderProductsTableEditar();
+            }
+        });
+        document.querySelector('#products-table').addEventListener('change', function(e) {
+            if (e.target.classList.contains('quantity-input')) {
+                const idx = e.target.getAttribute('data-idx');
+                let value = parseInt(e.target.value);
+                if (isNaN(value) || value < 1) value = 1;
+                if (value > productsAddedEditar[idx].stock) value = productsAddedEditar[idx].stock;
+                productsAddedEditar[idx].quantity = value;
+                e.target.value = value;
+            }
+            if (e.target.classList.contains('price-input')) {
+                const idx = e.target.getAttribute('data-idx');
+                let value = parseFloat(e.target.value);
+                if (isNaN(value) || value < 0) value = 0;
+                productsAddedEditar[idx].price = value;
+            }
+        });
+        document.getElementById('saleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.price-input').forEach(function(input) {
+                const idx = input.getAttribute('data-idx');
+                if (productsAddedEditar[idx]) {
+                    productsAddedEditar[idx].price = parseFloat(input.value);
+                }
+            });
+            if (productsAddedEditar.length === 0) {
+                alert('Debe agregar al menos un producto a la venta');
+                return;
+            }
+            const formData = new FormData(this);
+            productsAddedEditar.forEach((product, idx) => {
+                formData.append(`products[${idx}][product_id]`, product.id);
+                formData.append(`products[${idx}][quantity]`, product.quantity);
+                formData.append(`products[${idx}][price]`, product.price);
+            });
+            if (window.adminUnlockKey) {
+                formData.append('admin_unlock_key', window.adminUnlockKey);
+            }
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(async response => {
+                let data;
+                try { data = await response.json(); } catch { data = {}; }
+                if (!response.ok) {
+                    if (data.authorization_required) {
+                        showAuthorizationLinkEditar(data.invalid_products);
+                        return;
+                    }
+                    throw new Error(data.message || 'Error en la respuesta del servidor');
+                }
+                return data;
+            })
+            .then(data => {
+                if (!data) return;
+                if (data.success) {
+                    window.location.href = data.redirect || '/admin/sales';
+                } else if (data.authorization_required) {
+                    showAuthorizationLinkEditar(data.invalid_products);
+                } else {
+                    alert(data.message || 'Error al actualizar la venta');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar la venta. Por favor, intente nuevamente.');
+            });
+        });
+        function showAuthorizationLinkEditar(invalidProducts) {
+            if (document.getElementById('authorization-link')) return;
+            const form = document.getElementById('saleForm');
+            const submitRow = form.querySelector('.row.g-4.mt-2 .btn-success').parentElement;
+            const authDiv = document.createElement('div');
+            authDiv.className = 'mt-2';
+            let invalidProductsHtml = '';
+            if (invalidProducts && invalidProducts.length > 0) {
+                invalidProductsHtml = '<div class="alert alert-warning mt-2">';
+                invalidProductsHtml += '<strong>Productos con precio inválido:</strong><ul>';
+                invalidProducts.forEach(product => {
+                    invalidProductsHtml += `<li>${product.name}: Precio actual ($${product.unit_price}) es menor o igual al costo real ($${product.real_cost})</li>`;
+                });
+                invalidProductsHtml += '</ul></div>';
+            }
+            authDiv.innerHTML = `
+                ${invalidProductsHtml}
+                Pedir autorización para venta bajo costo real<a href="#" id="authorization-link" class="ink-underline-primary"> Autorizar </a>
+            `;
+            submitRow.insertBefore(authDiv, submitRow.firstChild);
+            document.getElementById('authorization-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showAuthorizationModal();
+            });
         }
     }
 
