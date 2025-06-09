@@ -104,7 +104,11 @@ class Product extends Model
     public function getAvailableStockAttribute()
     {
         $totalEntries = $this->entries()->sum('quantity');
-        $totalSales = $this->sales()->sum('quantity');
+        $totalSales = $this->saleDetails()
+            ->whereHas('sale', function($query) {
+                $query->where('status', 'completed');
+            })
+            ->sum('quantity');
         return $totalEntries - $totalSales;
     }
     

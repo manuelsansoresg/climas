@@ -24,4 +24,9 @@ class ProductSale extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    public function sale()
+    {
+        return $this->belongsTo(Sale::class);
+    }
 }

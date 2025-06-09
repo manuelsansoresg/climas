@@ -142,7 +142,7 @@ class SaleController extends Controller
                 $itemIva = $itemSubtotal * ($product->iva / 100);
 
                 SaleDetail::create([
-                    'sale_id' => $sale->id,
+                    'id' => $sale->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                     'price' => $price,

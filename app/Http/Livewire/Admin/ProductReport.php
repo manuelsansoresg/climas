@@ -84,12 +84,15 @@ class ProductReport extends Component
         $dateFrom = $this->appliedFilters['date_from'] ? Carbon::parse($this->appliedFilters['date_from'])->startOfDay() : null;
         $dateTo = $this->appliedFilters['date_to'] ? Carbon::parse($this->appliedFilters['date_to'])->endOfDay() : null;
         $products = $products->map(function($product) use ($dateFrom, $dateTo) {
-            $query = SaleDetail::where('product_id', $product->id);
-            if ($dateFrom) $query->whereHas('sale', fn($q) => $q->where('created_at', '>=', $dateFrom));
-            if ($dateTo) $query->whereHas('sale', fn($q) => $q->where('created_at', '<=', $dateTo));
+            $query = SaleDetail::where('product_id', $product->id)
+                ->whereHas('sale', function($q) use ($dateFrom, $dateTo) {
+                    $q->where('status', 'completed');
+                    if ($dateFrom) $q->where('created_at', '>=', $dateFrom);
+                    if ($dateTo) $q->where('created_at', '<=', $dateTo);
+                });
             $vendidos = $query->sum('quantity');
             $product->vendidos = $vendidos;
-            $product->existencia = $product->stock;
+            $product->existencia = $product->available_stock;
             return $product;
         });
 
