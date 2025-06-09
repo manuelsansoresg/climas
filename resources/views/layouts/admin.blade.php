@@ -47,6 +47,12 @@
                                     <h6 class="overline-title text-primary-alt">Dashboards</h6>
                                 </li><!-- .nk-menu-item -->
                                 <li class="nk-menu-item">
+                                    <a href="/admin/access-requests" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-user-list-fill"></em></span>
+                                        <span class="nk-menu-text">Prospectos</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
+                                <li class="nk-menu-item">
                                     <a href="/admin/sales" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>
                                         <span class="nk-menu-text">Ventas</span>
@@ -126,19 +132,19 @@
                                     </a>
                                 </li><!-- .nk-menu-item -->
 
-                                <li class="nk-menu-item">
+                              {{--   <li class="nk-menu-item">
                                     <a href="/admin/warehouses" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-package"></em></span>
                                         <span class="nk-menu-text">Almacén</span>
                                     </a>
-                                </li><!-- .nk-menu-item -->
+                                </li><!-- .nk-menu-item --> --}}
                                
-                                <li class="nk-menu-item">
+                               {{--  <li class="nk-menu-item">
                                     <a href="/admin/sales/create" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-cart-fill"></em></span>
                                         <span class="nk-menu-text">Ventas</span>
                                     </a>
-                                </li><!-- .nk-menu-item -->
+                                </li><!-- .nk-menu-item --> --}}
 
                                 {{-- <li class="nk-menu-item has-sub">
                                     <a href="#" class="nk-menu-link nk-menu-toggle">

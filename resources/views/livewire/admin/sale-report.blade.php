@@ -56,7 +56,9 @@
                                                 <td>${{ number_format($row['monto_venta'], 2) }}</td>
                                                 <td>${{ number_format($row['costo_real'], 2) }}</td>
                                                 <td>${{ number_format($row['ganancia'], 2) }}</td>
-                                                <td><a href="/admin/sales/{{ $row['id'] }}"><i class="fa fa-eye"></i></a></td>
+                                                <td>
+                                                    <a href="/admin/sales/{{ $row['id'] }}" class="btn btn-sm btn-info">Ver</a>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>

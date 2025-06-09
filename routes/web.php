@@ -92,6 +92,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
         ->name('sales.vendor-details');
 
     Route::post('sales/{sale}/delete-file', [App\Http\Controllers\Admin\SaleController::class, 'deleteFile'])->name('sales.delete-file');
+
+    Route::get('/access-requests', [App\Http\Controllers\Admin\AccessRequestController::class, 'index'])->name('access-requests.index');
+    Route::get('/access-requests/{accessRequest}/edit', [App\Http\Controllers\Admin\AccessRequestController::class, 'edit'])->name('access-requests.edit');
+    Route::put('/access-requests/{accessRequest}', [App\Http\Controllers\Admin\AccessRequestController::class, 'update'])->name('access-requests.update');
+    Route::post('/access-requests/{accessRequest}/move-to-user', [App\Http\Controllers\Admin\AccessRequestController::class, 'moveToUser'])->name('access-requests.move-to-user');
 });
 
 // API routes for product search

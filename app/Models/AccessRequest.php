@@ -17,5 +17,6 @@ class AccessRequest extends Model
         'cp',
         'rfc',
         'address',
+        'status',
     ];
 }
