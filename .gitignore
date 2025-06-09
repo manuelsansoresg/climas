@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/images/comprobante_pago
 /storage/*.key
 /vendor
 /public/uploads/products/
