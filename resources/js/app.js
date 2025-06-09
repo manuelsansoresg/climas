@@ -964,6 +964,64 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }, 1000);
 
+    // File transfer preview and handling
+    if (document.getElementById('file_transfer')) {
+        const fileInput = document.getElementById('file_transfer');
+        const filePreview = document.getElementById('file-preview');
+        const previewImage = document.getElementById('preview-image');
+        const previewPdf = document.getElementById('preview-pdf');
 
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const fileType = file.type;
+                
+                filePreview.style.display = 'block';
+                
+                if (fileType.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        previewPdf.style.display = 'none';
+                    }
+                    reader.readAsDataURL(file);
+                } else if (fileType === 'application/pdf') {
+                    previewImage.style.display = 'none';
+                    previewPdf.style.display = 'block';
+                    previewPdf.querySelector('a').href = URL.createObjectURL(file);
+                }
+            } else {
+                filePreview.style.display = 'none';
+            }
+        });
+    }
+
+    // Function to delete file
+    window.deleteFile = function() {
+        if (confirm('¿Está seguro de eliminar el comprobante de pago?')) {
+            // Obtener el ID de la venta de la URL actual (el número antes de /edit)
+            const pathParts = window.location.pathname.split('/');
+            const editIndex = pathParts.indexOf('edit');
+            const saleId = pathParts[editIndex - 1];
+            
+            axios.post(`/admin/sales/${saleId}/delete-file`, {}, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => {
+                if (response.data.success) {
+                    location.reload();
+                } else {
+                    alert('Error al eliminar el archivo');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar el archivo');
+            });
+        }
+    }
 });
 

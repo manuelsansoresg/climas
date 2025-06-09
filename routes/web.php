@@ -90,6 +90,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
 
     Route::get('/sales/vendor-details/{userId}/{dateFrom?}/{dateTo?}', \App\Http\Livewire\Admin\VendorSalesDetails::class)
         ->name('sales.vendor-details');
+
+    Route::post('sales/{sale}/delete-file', [App\Http\Controllers\Admin\SaleController::class, 'deleteFile'])->name('sales.delete-file');
 });
 
 // API routes for product search

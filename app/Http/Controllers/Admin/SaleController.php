@@ -36,7 +36,8 @@ class SaleController extends Controller
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|in:cash,credit_card,transfer',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
+            'file_transfer' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
         ]);
 
         try {
@@ -45,6 +46,14 @@ class SaleController extends Controller
             $subtotal = 0;
             $iva = 0;
             $total = 0;
+            
+            // Procesar el archivo de comprobante si existe
+            $fileName = null;
+            if ($request->hasFile('file_transfer')) {
+                $file = $request->file('file_transfer');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/comprobante_pago'), $fileName);
+            }
             
             // Agrupar cantidades por producto
             $productQuantities = [];
@@ -122,7 +131,8 @@ class SaleController extends Controller
                 'payment_method' => $request->payment_method,
                 'notes' => $request->notes,
                 'status' => $request->status,
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                'file_transfer' => $fileName
             ]);
             // Create sale details
             foreach ($request->products as $item) {
@@ -211,11 +221,28 @@ class SaleController extends Controller
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|in:cash,credit_card,transfer',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
+            'file_transfer' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
         ]);
 
         try {
             DB::beginTransaction();
+
+            // Procesar el archivo de comprobante si existe
+            $fileName = $sale->file_transfer;
+            if ($request->hasFile('file_transfer')) {
+                // Eliminar archivo anterior si existe
+                if ($sale->file_transfer) {
+                    $oldFile = public_path('images/comprobante_pago/' . $sale->file_transfer);
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+                
+                $file = $request->file('file_transfer');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/comprobante_pago'), $fileName);
+            }
 
             $subtotal = 0;
             $iva = 0;
@@ -301,7 +328,8 @@ class SaleController extends Controller
                 'total' => $total,
                 'payment_method' => $request->payment_method,
                 'notes' => $request->notes,
-                'status' => $request->status
+                'status' => $request->status,
+                'file_transfer' => $fileName
             ]);
 
             // Eliminar detalles actuales
@@ -382,5 +410,44 @@ class SaleController extends Controller
         return $product->precio_publico;
     }
 
-   
+    public function destroy(Sale $sale)
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Eliminar archivo de comprobante si existe
+            if ($sale->file_transfer) {
+                $file = public_path('images/comprobante_pago/' . $sale->file_transfer);
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+            }
+            
+            $sale->delete();
+            
+            DB::commit();
+            
+            return redirect()->route('admin.sales.index')->with('success', 'Venta eliminada exitosamente');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.sales.index')->with('error', 'Error al eliminar la venta: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteFile(Sale $sale)
+    {
+        try {
+            if ($sale->file_transfer) {
+                $file = public_path('images/comprobante_pago/' . $sale->file_transfer);
+                if (file_exists($file)) {
+                    unlink($file);
+                }
+                $sale->update(['file_transfer' => null]);
+                return response()->json(['success' => true]);
+            }
+            return response()->json(['success' => false, 'message' => 'No hay archivo para eliminar']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el archivo: ' . $e->getMessage()]);
+        }
+    }
 }

@@ -59,7 +59,22 @@
                                             </select>
                                         </div>
                                     </div>
-                                    
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="file_transfer">Comprobante de Pago</label>
+                                            <input type="file" name="file_transfer" id="file_transfer" class="form-control @error('file_transfer') is-invalid @enderror" accept=".jpeg,.jpg,.png,.pdf">
+                                            <small class="form-text text-muted">Formatos permitidos: JPG, JPEG, PNG, PDF. Tamaño máximo: 2MB</small>
+                                            @error('file_transfer')
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                            <div id="file-preview" class="mt-2" style="display: none;">
+                                                <img id="preview-image" src="" alt="Vista previa" style="max-width: 200px; display: none;">
+                                                <div id="preview-pdf" style="display: none;">
+                                                    <a href="#" target="_blank" class="btn btn-sm btn-info">Ver PDF</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="payment_method">*Almacén</label>
