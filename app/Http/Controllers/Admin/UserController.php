@@ -17,7 +17,7 @@ class UserController extends Controller
     */
    public function index()
    {
-       $users = User::role(['Cliente mayorista', 'Cliente publico en general', 'Cliente instalador', 'Almacen', 'Vendedor'])->get();
+       $users = User::get();
        return view('admin.users.index', compact('users'));
    }
 
