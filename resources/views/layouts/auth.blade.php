@@ -6,7 +6,7 @@
     <meta name="author" content="Softnio">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description"
-        content="Una potente y conceptual plantilla de panel de control de aplicaciones especialmente diseñada para desarrolladores y programadores.">
+        content="Una Sistema de gestión de ventas y reportes para Backti">
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="./images/favicon.png">
     <!-- Page Title  -->
