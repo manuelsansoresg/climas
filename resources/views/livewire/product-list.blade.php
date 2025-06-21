@@ -105,9 +105,9 @@
                     <!-- Producto  -->
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="card h-100 shadow-sm border-0 product-card">
-                        <div class="position-absolute top-0 start-0 m-2">
+                       {{--  <div class="position-absolute top-0 start-0 m-2">
                             <span class="badge bg-danger">OFERTA</span>
-                        </div>
+                        </div> --}}
                         <img src="{{ asset($product->image) }}" class="card-img-top p-3" alt="{{ $product->name }}">
                         <div class="card-body text-center">
                             {{-- <div class="text-muted small mb-1">MABE</div> --}}
