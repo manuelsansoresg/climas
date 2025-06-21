@@ -39,7 +39,7 @@ class ProductController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'category_id' => 'required|exists:categories,id',
+                'category_id' => 'nullable|exists:categories,id',
                 'subcategory_id' => 'nullable|exists:subcategories,id',
                 'subcategory2_id' => 'nullable|exists:subcategories2,id',
                 'subcategory3_id' => 'nullable|exists:subcategories3,id',
@@ -58,7 +58,6 @@ class ProductController extends Controller
             ], [
                 'name.required' => 'El nombre del producto es obligatorio',
                 'name.max' => 'El nombre no puede tener más de 255 caracteres',
-                'category_id.required' => 'Debe seleccionar una categoría',
                 'category_id.exists' => 'La categoría seleccionada no es válida',
                 'subcategory_id.exists' => 'La subcategoría seleccionada no es válida',
                 'subcategory2_id.exists' => 'La subcategoría 2 seleccionada no es válida',
@@ -72,8 +71,6 @@ class ProductController extends Controller
                 'precio_publico.min' => 'El precio público no puede ser negativo',
                 'precio_instalador.numeric' => 'El precio instalador debe ser un número',
                 'precio_instalador.min' => 'El precio instalador no puede ser negativo',
-                //'stock.integer' => 'El stock debe ser un número entero',
-                //'stock.min' => 'El stock no puede ser negativo',
                 'iva.required' => 'El IVA es obligatorio',
                 'iva.numeric' => 'El IVA debe ser un número',
                 'iva.min' => 'El IVA no puede ser negativo',
@@ -91,7 +88,6 @@ class ProductController extends Controller
                 'sucursales.required' => 'Debe seleccionar al menos una sucursal',
                 'sucursales.*.exists' => 'Una de las sucursales seleccionadas no es válida'
             ]);
-
             // Crear el producto
             $product = new Product();
             $product->name = $request->name;
@@ -196,7 +192,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
             'subcategory_id' => 'nullable|exists:subcategories,id',
             'subcategory2_id' => 'nullable|exists:subcategories2,id',
             'subcategory3_id' => 'nullable|exists:subcategories3,id',

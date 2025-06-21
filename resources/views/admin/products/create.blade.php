@@ -49,7 +49,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="category_id">Categoría <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
+                                            <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id">
                                                 <option value="">Seleccione una categoría</option>
                                                 @foreach($categories as $category)
                                                     <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
