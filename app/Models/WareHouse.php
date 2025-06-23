@@ -9,6 +9,7 @@ class Warehouse extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'location'];
+    protected $table = 'warehouses';
 
     public function productEntries()
     {
