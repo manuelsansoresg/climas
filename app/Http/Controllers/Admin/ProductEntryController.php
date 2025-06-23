@@ -15,6 +15,7 @@ class ProductEntryController extends Controller
         $productEntries = ProductEntry::with(['product', 'warehouse'])->orderBy('entry_date', 'desc')->paginate(15);
         return view('admin.product_entries.index', compact('productEntries'));
     }
+    
 
     public function create()
     {
