@@ -1,6 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+.gallery-thumb {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.gallery-thumb:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+}
+
+.gallery-thumb.active {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+#main-img {
+    transition: transform 0.3s ease;
+}
+
+#main-img:hover {
+    transform: scale(1.02);
+}
+
+#gallery-up, #gallery-down {
+    transition: color 0.3s ease;
+}
+
+#gallery-up:hover, #gallery-down:hover {
+    color: #007bff !important;
+}
+</style>
 <div class="container py-4">
     <div class="row">
         <div class="col-12 col-lg-7 mb-4 mb-lg-0">
@@ -10,10 +42,16 @@
                     <button class="btn btn-link p-0 mb-2" id="gallery-up" style="color: #888;">&#9650;</button>
                     <div id="gallery-thumbs" class="d-flex flex-column align-items-center" style="gap: 10px;">
                         @php
-                            $images = $product->images;
+                            $allImages = collect();
+                            // Agregar imagen principal si existe
+                            if($product->image) {
+                                $allImages->push((object)['image' => $product->image]);
+                            }
+                            // Agregar imágenes adicionales
+                            $allImages = $allImages->merge($product->images);
                         @endphp
-                        @foreach ($images as $image)
-                            <img src="{{ asset($image->image)}}" class="img-thumbnail mb-2 gallery-thumb" data-index="0" style="cursor:pointer; width:70px; height:70px; object-fit:cover;" alt="Miniatura 1">
+                        @foreach ($allImages as $index => $image)
+                            <img src="{{ asset($image->image)}}" class="img-thumbnail mb-2 gallery-thumb" data-index="{{ $index }}" style="cursor:pointer; width:70px; height:70px; object-fit:cover;" alt="Miniatura {{ $index + 1 }}">
                         @endforeach
                     </div>
                     <button class="btn btn-link p-0 mt-2" id="gallery-down" style="color: #888;">&#9660;</button>
@@ -29,9 +67,9 @@
             <h5 class="text-uppercase text-muted mb-1">{{ $product->name }}</h5>
             <h2 class="fw-bold mb-3"> {{ $product->description }} </h2>
             <div class="mb-2">
-                <span class="fs-3 fw-bold text-primary">$2,821.00</span>
-                <span class="text-decoration-line-through text-muted ms-2">${{ number_format($product->precio_publico, 2) }}</span>
-                <span class="badge bg-danger ms-2">OFERTA</span>
+                <span class="fs-3 fw-bold text-primary">${{number_format($product->precio_publico, 2) }}</span>
+                {{-- <span class="text-decoration-line-through text-muted ms-2">${{ number_format($product->precio_publico, 2) }}</span> --}}
+                {{-- <span class="badge bg-danger ms-2">OFERTA</span> --}}
             </div>
             <p class="mb-2">Los <a href="#">gastos de envío</a> se calculan en la pantalla de pago.</p>
             <p class="mb-2">Paga hasta en <b>5 plazos</b> con <span class="badge bg-primary">mercado pago</span> </p>
@@ -99,4 +137,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
