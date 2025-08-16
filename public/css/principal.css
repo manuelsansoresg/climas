@@ -21,6 +21,28 @@
   border-radius: 0.5rem;
 }
 
+.product-card .card-img-top {
+  height: 200px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  -o-object-position: center;
+     object-position: center;
+}
+.product-card .card-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+.product-card .card-body .card-title {
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-card .card-body .btn {
+  margin-top: auto;
+}
+
 @media (min-width: 992px) {
   .navbar-nav.custom-animated-links .nav-link {
     position: relative;

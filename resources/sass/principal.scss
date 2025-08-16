@@ -21,6 +21,32 @@
     border-radius: 0.5rem;
 }
 
+// Estilos para las tarjetas de productos
+.product-card {
+    .card-img-top {
+        height: 200px;
+        object-fit: contain;
+        object-position: center;
+    }
+    
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        min-height: 200px;
+        
+        .card-title {
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn {
+            margin-top: auto;
+        }
+    }
+}
+
 
 @media (min-width: 992px) {
     .navbar-nav.custom-animated-links .nav-link {
