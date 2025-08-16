@@ -48,7 +48,28 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Categoría eliminada exitosamente');
+        try {
+            // Contar productos y subcategorías antes de eliminar
+            $productsCount = $category->products()->count();
+            $subcategoriesCount = $category->subcategories()->count();
+            
+            // Eliminar la categoría (las restricciones de BD manejan automáticamente las relaciones)
+            $category->delete();
+            
+            // Crear mensaje informativo
+            $message = 'Categoría eliminada exitosamente';
+            if ($productsCount > 0) {
+                $message .= ". Se desasignó la categoría de {$productsCount} producto(s)";
+            }
+            if ($subcategoriesCount > 0) {
+                $message .= ". Se eliminaron {$subcategoriesCount} subcategoría(s)";
+            }
+            $message .= '.';
+            
+            return redirect()->route('admin.categories.index')->with('success', $message);
+            
+        } catch (\Exception $e) {
+            return redirect()->route('admin.categories.index')->with('error', 'Error al eliminar la categoría: ' . $e->getMessage());
+        }
     }
-} 
+}
