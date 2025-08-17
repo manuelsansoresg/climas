@@ -145,6 +145,16 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
+                                            <label for="precio_publico">Precio de descuento <span class="text-danger">*</span></label>
+
+                                            <input type="number" step="0.01" class="form-control @error('discount') is-invalid @enderror" id="discount" name="discount" value="{{ old('discount') }}" required>
+                                            @error('discount')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
                                             <label for="precio_instalador">Precio instalador</label>
                                             <input type="number" step="0.01" class="form-control @error('precio_instalador') is-invalid @enderror" id="precio_instalador" name="precio_instalador" value="{{ old('precio_instalador') }}">
                                             @error('precio_instalador')

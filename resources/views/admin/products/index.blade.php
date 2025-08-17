@@ -39,7 +39,6 @@
                                         <th>Subcategoría 2</th>
                                         <th>Subcategoría 3</th>
                                         <th>Precio Público</th>
-                                        <th>Stock</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -59,7 +58,6 @@
                                             <td>{{ $product->subcategory2->name ?? 'N/A' }}</td>
                                             <td>{{ $product->subcategory3->name ?? 'N/A' }}</td>
                                             <td>${{ number_format($product->precio_publico, 2) }}</td>
-                                            <td>{{ $product->stock }}</td>
                                             <td>
                                                 <span class="badge bg-{{ $product->active ? 'success' : 'danger' }}">
                                                     {{ $product->active ? 'Activo' : 'Inactivo' }}

@@ -143,6 +143,15 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
+                                            <label for="discount">Precio de descuento</label>
+                                            <input type="number" step="0.01" class="form-control @error('discount') is-invalid @enderror" id="discount" name="discount" value="{{ old('discount', $product->discount) }}" required>
+                                            @error('discount')
+                                                <span class="invalid-feedback">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
                                             <label for="precio_instalador">Precio instalador</label>
                                             <input type="number" step="0.01" class="form-control @error('precio_instalador') is-invalid @enderror" id="precio_instalador" name="precio_instalador" value="{{ old('precio_instalador', $product->precio_instalador) }}">
                                             @error('precio_instalador')
@@ -262,7 +271,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group mt-3">
                                     <button type="submit" class="btn btn-primary">Actualizar Producto</button>
                                     <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Cancelar</a>
                                 </div>

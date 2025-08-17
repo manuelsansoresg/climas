@@ -105,15 +105,22 @@
                     <!-- Producto  -->
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="card h-100 shadow-sm border-0 product-card">
-                       {{--  <div class="position-absolute top-0 start-0 m-2">
-                            <span class="badge bg-danger">OFERTA</span>
-                        </div> --}}
+                        @if ($product->discount > 0)
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge bg-danger">OFERTA</span>
+                            </div>
+                        @endif
                         <img src="{{ asset($product->image) }}" class="card-img-top p-3" alt="{{ $product->name }}">
                         <div class="card-body text-center">
                             {{-- <div class="text-muted small mb-1">MABE</div> --}}
                             <h5 class="card-title mb-2">{{ $product->name }}</h5>
                             <div class="mb-2">
-                                <span class="fw-bold fs-5 text-primary">${{ number_format($product->precio_publico, 2) }}</span>
+                                @if ($product->discount > 0)
+                                    <span class="fs-3 fw-bold text-primary">${{number_format($product->discount, 2) }}</span>
+                                    <span class="text-decoration-line-through text-muted ms-2">${{ number_format($product->getPriceForUser(), 2) }}</span>
+                                @else
+                                    <span class="fw-bold text-primary fs-5">${{ number_format($product->getPriceForUser(), 2) }}</span>
+                                @endif
                                 {{-- <span class="text-decoration-line-through text-muted ms-2">$ 6,332.00</span> --}}
                             </div>
                             <div class="mb-2">

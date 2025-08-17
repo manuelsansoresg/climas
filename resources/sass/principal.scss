@@ -48,6 +48,24 @@
 }
 
 
+// Estilos para las tarjetas de productos relacionados
+.related-product-card {
+    .card-body {
+        min-height: 280px;
+        
+        .related-product-description {
+            min-height: 4.5rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
 @media (min-width: 992px) {
     .navbar-nav.custom-animated-links .nav-link {
         position: relative;

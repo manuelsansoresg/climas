@@ -67,9 +67,14 @@
             <h5 class="text-uppercase text-muted mb-1">{{ $product->name }}</h5>
             <h2 class="fw-bold mb-3"> {{ $product->description }} </h2>
             <div class="mb-2">
-                <span class="fs-3 fw-bold text-primary">${{number_format($product->precio_publico, 2) }}</span>
-                {{-- <span class="text-decoration-line-through text-muted ms-2">${{ number_format($product->precio_publico, 2) }}</span> --}}
-                {{-- <span class="badge bg-danger ms-2">OFERTA</span> --}}
+                @if ($product->discount > 0)
+                    <span class="fs-3 fw-bold text-primary">${{number_format($product->discount, 2) }}</span>
+                    <span class="text-decoration-line-through text-muted ms-2">${{ number_format($product->getPriceForUser(), 2) }}</span>
+                    <span class="badge bg-danger ms-2">OFERTA</span>
+                @else
+                    <span class="fs-3 fw-bold text-primary">${{number_format($product->getPriceForUser(), 2) }}</span>
+                @endif
+                
             </div>
             <p class="mb-2">Los <a href="#">gastos de envío</a> se calculan en la pantalla de pago.</p>
             <p class="mb-2">Paga hasta en <b>5 plazos</b> con <span class="badge bg-primary">mercado pago</span> </p>
@@ -117,19 +122,28 @@
             @foreach ($relatedProducts as $related)
                 <!-- Producto 1 -->
                 <div class="col-12 col-md-4 col-lg-4">
-                    <div class="card h-100 position-relative shadow-sm">
+                    <div class="card h-100 position-relative shadow-sm related-product-card">
+                        @if ($related->discount > 0)
+                            <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span>
+                        @endif
                         {{-- <span class="badge bg-primary position-absolute m-2" style="z-index:2;">OFERTA</span> --}}
                         <img src="{{ asset($related->image) }}" class="card-img-top p-3" style="height:120px;object-fit:contain;" alt="{{ $related->name }}">
 
 
-                        <div class="card-body text-center">
+                        <div class="card-body text-center d-flex flex-column">
                             <div class="text-muted small mb-1"> {{ $related->name }} </div>
-                            <h6 class="card-title mb-2">{{ $related->description }}</h6>
+                            <h6 class="card-title mb-2 related-product-description">{{ $related->description }}</h6>
                             <div class="mb-2">
-                                <span class="fw-bold text-primary fs-4">${{ number_format($related->precio_publico, 2) }}</span>
+                                @if ($related->discount > 0)
+                                    <span class="fs-3 fw-bold text-primary">${{number_format($related->discount, 2) }}</span>
+                                    <span class="text-decoration-line-through text-muted ms-2">${{ number_format($related->getPriceForUser(), 2) }}</span>
+                                @else
+                                    <span class="fw-bold text-primary fs-4">${{ number_format($related->getPriceForUser(), 2) }}</span>
+                                @endif
                                 {{-- <span class="text-decoration-line-through text-muted ms-2">$ 6,332.00</span> --}}
                             </div>
-                            <a href="#" class="btn btn-primary w-100">Ver Detalles</a>
+                            <a href="/productos/{{  $related->slug }}" class="btn btn-primary w-100 mt-auto">Ver Detalles</a>
+
                         </div>
                     </div>
                 </div>

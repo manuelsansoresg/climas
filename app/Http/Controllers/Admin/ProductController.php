@@ -47,6 +47,7 @@ class ProductController extends Controller
                 'precio_distribuidor' => 'nullable|numeric|min:0',
                 'precio_publico' => 'required|numeric|min:0',
                 'precio_instalador' => 'nullable|numeric|min:0',
+                'discount' => 'nullable|numeric|min:0',
                 //'stock' => 'null|integer|min:0',
                 'iva' => 'required|numeric|min:0|max:100',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -101,7 +102,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->precio_instalador = $request->precio_instalador;
-            //$product->stock = $request->stock;
+            $product->discount = $request->discount;
             $product->iva = $request->iva;
             $product->active = $request->active;
 
@@ -200,7 +201,7 @@ class ProductController extends Controller
             'precio_distribuidor' => 'nullable|numeric|min:0',
             'precio_publico' => 'required|numeric|min:0',
             'precio_instalador' => 'nullable|numeric|min:0',
-            //'stock' => 'null|integer|min:0',
+            'discount' => 'nullable|numeric|min:0',
             'iva' => 'required|numeric|min:0|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -224,7 +225,7 @@ class ProductController extends Controller
             $product->precio_distribuidor = $request->precio_distribuidor;
             $product->precio_publico = $request->precio_publico;
             $product->precio_instalador = $request->precio_instalador;
-            //$product->stock = $request->stock;
+            $product->discount = $request->discount;
             $product->iva = $request->iva;
             $product->active = $request->active;
 
