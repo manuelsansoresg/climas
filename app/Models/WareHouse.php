@@ -46,4 +46,5 @@ class Warehouse extends Model
         $sales = $this->sales()->where('warehouse_id', $warehouseId)->sum('quantity');
         return $entries - $sales;
     }
+    
 }
