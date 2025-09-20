@@ -97,6 +97,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:Almacen,Vended
     Route::get('/access-requests/{accessRequest}/edit', [App\Http\Controllers\Admin\AccessRequestController::class, 'edit'])->name('access-requests.edit');
     Route::put('/access-requests/{accessRequest}', [App\Http\Controllers\Admin\AccessRequestController::class, 'update'])->name('access-requests.update');
     Route::post('/access-requests/{accessRequest}/move-to-user', [App\Http\Controllers\Admin\AccessRequestController::class, 'moveToUser'])->name('access-requests.move-to-user');
+
+    Route::resource('config', \App\Http\Controllers\Admin\ConfigController::class);
+    Route::resource('banner-principal', \App\Http\Controllers\Admin\BannerPrincipalController::class);
 });
 
 // API routes for product search

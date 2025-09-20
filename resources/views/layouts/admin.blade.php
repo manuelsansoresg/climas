@@ -131,6 +131,20 @@
                                         <span class="nk-menu-text">Productos</span>
                                     </a>
                                 </li><!-- .nk-menu-item -->
+                                
+                                <li class="nk-menu-item">
+                                    <a href="/admin/config" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-setting"></em></span>
+                                        <span class="nk-menu-text">Configuración</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
+                                
+                                <li class="nk-menu-item">
+                                    <a href="/admin/banner-principal" class="nk-menu-link">
+                                        <span class="nk-menu-icon"><em class="icon ni ni-img"></em></span>
+                                        <span class="nk-menu-text">Banner Principal</span>
+                                    </a>
+                                </li><!-- .nk-menu-item -->
 
                               {{--   <li class="nk-menu-item">
                                     <a href="/admin/warehouses" class="nk-menu-link">

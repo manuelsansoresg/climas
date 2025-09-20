@@ -20,15 +20,15 @@
                 <ul class="list-unstyled mb-0">
                     <li class="mb-3">
                         <i class="fas fa-envelope fa-fw text-primary me-2"></i>
-                        <strong>Email:</strong> <a href="mailto:contacto@ejemplo.com">contacto@ejemplo.com</a>
+                        <strong>Email:</strong> <a href="mailto:{{ $config->email ?? 'contacto@ejemplo.com' }}">{{ $config->email ?? 'contacto@ejemplo.com' }}</a>
                     </li>
                     <li class="mb-3">
                         <i class="fas fa-phone fa-fw text-primary me-2"></i>
-                        <strong>Teléfono:</strong> <a href="tel:+525512345678">+52 55 1234 5678</a>
+                        <strong>Teléfono:</strong> <a href="tel:{{ $config->phone ?? '+525512345678' }}">{{ $config->phone ?? '+52 55 1234 5678' }}</a>
                     </li>
                     <li>
                         <i class="fas fa-map-marker-alt fa-fw text-primary me-2"></i>
-                        <strong>Dirección:</strong> Calle Falsa 123, Ciudad, País
+                        <strong>Dirección:</strong> {{ $config->address ?? 'Calle Falsa 123, Ciudad, País' }}
                     </li>
                 </ul>
             </div>

@@ -139,18 +139,23 @@
                 <div class="col-lg-3 mb-4 mb-lg-0">
                     <h5 class="text-secondary mb-3">Contacto</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i> (123) 456-7890</li>
-                        <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> info@backticlimas.com</li>
-                        <li class="mb-2"><i class="fas fa-map-marker-alt text-primary me-2"></i> Dirección Ejemplo #123</li>
+                        <li class="mb-2"><i class="fas fa-phone text-primary me-2"></i> {{ $config->phone ?? '(123) 456-7890' }}</li>
+                        <li class="mb-2"><i class="fas fa-envelope text-primary me-2"></i> {{ $config->email ?? 'info@backticlimas.com' }}</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt text-primary me-2"></i> {{ $config->address ?? 'Dirección Ejemplo #123' }}</li>
                     </ul>
                 </div>
                 <div class="col-lg-3">
                     <h5 class="text-secondary mb-3">Síguenos</h5>
                     <div class="d-flex gap-3">
-                        <a href="#" class="text-primary"><i class="fab fa-facebook fa-2x"></i></a>
-                        <a href="#" class="text-primary"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="#" class="text-primary"><i class="fab fa-twitter fa-2x"></i></a>
-                        <a href="#" class="text-primary"><i class="fab fa-linkedin fa-2x"></i></a>
+                        @if($config->fb)
+                            <a href="{{ $config->fb }}" class="text-primary" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                        @endif
+                        @if($config->instagram)
+                            <a href="{{ $config->instagram }}" class="text-primary" target="_blank"><i class="fab fa-instagram fa-2x"></i></a>
+                        @endif
+                        @if($config->x)
+                            <a href="{{ $config->x }}" class="text-primary" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                        @endif
                     </div>
                 </div>
             </div>

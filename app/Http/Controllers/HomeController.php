@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\BannerPrincipal;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -29,7 +30,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('index');
+        $banners = BannerPrincipal::all();
+        return view('index', compact('banners'));
     }
 
     public function productDetail($slug)
